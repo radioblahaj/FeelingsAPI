@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model feelings {
+  id       Int       @id @default(autoincrement())
+  date     DateTime?
+  feeling  String?
+  note     String?
+  feeling2 String?
+  share    Boolean?  @default(false)
+  category String?
+}
