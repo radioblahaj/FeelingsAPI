@@ -83,11 +83,7 @@ console.log("Received new feeling:", newFeeling);
 
  
 
-  const category = getCategory(newFeeling.feeling1);
-  
-  
-  
-
+  const category = getCategory(newFeeling.feeling1, newFeeling.feeling2);
     
     try {
         const feeling = await prisma.feelings.create({
