@@ -15,4 +15,5 @@ model feelings {
   feeling2 String?
   share    Boolean?  @default(false)
   category String?
+  category2 String?
 }

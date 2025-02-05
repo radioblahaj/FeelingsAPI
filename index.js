@@ -28,18 +28,15 @@ const feelingsCategories = [
     {"feeling": "disconnected", category: "blue"},
 ]
 
-function getCategory(feeling, feeling2) {
+function getCategory(feeling) {
     let category = ""
     let category2 = ""
     for (let i = 0; i < feelingsCategories.length; i++) {
         if (feeling === feelingsCategories[i].feeling) {
           category = feelingsCategories[i].category
         }
-        if (feeling2 === feelingsCategories[i].feeling) {
-            category2 = feelingsCategories[i].category
-        }
     }
-    return category, category2
+    return category
   }
 
 app.get('/', (req, res) => 
@@ -83,8 +80,10 @@ console.log("Received new feeling:", newFeeling);
 
  
 
-  const category = getCategory(newFeeling.feeling1, newFeeling.feeling2);
-    
+  const category = getCategory(newFeeling.feeling1);
+  const category2 = getCategory(newFeeling.feeling2);
+
+  
     try {
         const feeling = await prisma.feelings.create({
             data: {
@@ -93,7 +92,8 @@ console.log("Received new feeling:", newFeeling);
                 note: newFeeling.note,
                 feeling2: newFeeling.feeling2,
                 share: newFeeling.share,
-                category: category
+                category: category,
+                category2: category2
             }
         });
 
