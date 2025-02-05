@@ -11,7 +11,6 @@ async function addFeeling(args) {
     const feeling2 = commands[1];
     const note = commands[2];
     const share = commands[3];
-    const api = `localhost:3000/feelings?feeling=${feeling}&feeling2=${feeling2}&note=${note}&share=${share}`
 
     //TODO: Add temporary channel banning
 
@@ -37,7 +36,21 @@ async function addFeeling(args) {
             text: `${feeling} ${feeling2} ${note} ${share}`
         });
 
-       
+        const response = await fetch("http://localhost:3000/feelings", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                feeling1: feeling, 
+                feeling2: feeling2, 
+                note: note, 
+                share: share === "true" 
+            })
+        });
+
+        const data = await response.json();
+        console.log(data);
 
       
 
