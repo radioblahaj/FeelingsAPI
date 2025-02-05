@@ -30,12 +30,16 @@ const feelingsCategories = [
 
 function getCategory(feeling, feeling2) {
     let category = ""
+    let category2 = ""
     for (let i = 0; i < feelingsCategories.length; i++) {
         if (feeling === feelingsCategories[i].feeling) {
           category = feelingsCategories[i].category
         }
+        if (feeling2 === feelingsCategories[i].feeling) {
+            category2 = feelingsCategories[i].category
+        }
     }
-    return category
+    return category, category2
   }
 
 app.get('/', (req, res) => 
