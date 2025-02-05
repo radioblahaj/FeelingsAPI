@@ -78,7 +78,6 @@ console.log("Received new feeling:", newFeeling);
     newFeeling.note = "";
   }
 
- 
 
   const category = getCategory(newFeeling.feeling1);
   const category2 = getCategory(newFeeling.feeling2);
@@ -98,8 +97,6 @@ console.log("Received new feeling:", newFeeling);
         });
 
         res.json({
-            status: "success",
-            message: "Feeling saved!",
             data: feeling
         });
     } catch (error) {
@@ -109,6 +106,15 @@ console.log("Received new feeling:", newFeeling);
             error: error.message
         });
     }
+});
+
+app.delete('/feelings/:id', async (req, res) => {
+    const feeling = await prisma.feelings.delete({
+        where: {
+            id: req.params.id
+        }
+    });
+    res.send("Deleted feeling at ID: " + req.params.id);
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}! http://localhost:${port}/`));
