@@ -28,6 +28,15 @@ const feelingsCategories = [
     {"feeling": "disconnected", category: "blue"},
 ]
 
+function getCategory(feeling, feeling2) {
+    let category = ""
+    for (let i = 0; i < feelingsCategories.length; i++) {
+        if (feeling === feelingsCategories[i].feeling) {
+          category = feelingsCategories[i].category
+        }
+    }
+    return category
+  }
 
 app.get('/', (req, res) => 
      res.send('Hello World!'));
@@ -68,17 +77,10 @@ console.log("Received new feeling:", newFeeling);
     newFeeling.note = "";
   }
 
-   function getCategory(feeling) {
-    let category = ""
-    for (let i = 0; i < feelingsCategories.length; i++) {
-        if (feeling === feelingsCategories[i].feeling) {
-          category = feelingsCategories[i].category
-        }
-    }
-    return category
-  }
+ 
 
   const category = getCategory(newFeeling.feeling1);
+  
   
   
 
@@ -91,7 +93,7 @@ console.log("Received new feeling:", newFeeling);
                 note: newFeeling.note,
                 feeling2: newFeeling.feeling2,
                 share: newFeeling.share,
-                category: newFeeling.category
+                category: category
             }
         });
 
