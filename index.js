@@ -61,6 +61,8 @@ app.get('/feelings', async(req, res, next) => {
     })
 });
 
+
+
 app.post('/feelings', async (req, res) => {
     const newFeeling = req.body;
     
@@ -96,9 +98,11 @@ console.log("Received new feeling:", newFeeling);
             }
         });
 
+        const categories = {category, category2}
         res.json({
-            data: feeling
+            data: categories
         });
+        
     } catch (error) {
         res.status(500).json({
             status: "error",

@@ -1,4 +1,3 @@
-
 async function addFeeling(args) {
     const { payload, client } = args;
     const { user_id, text, channel_id } = payload;
@@ -22,6 +21,7 @@ async function addFeeling(args) {
     const errors = []
     if(!feeling) errors.push("A feeling is required.")
     if(!feeling2) errors.push("A feeling is required.")
+    if(!isAdmin) errors.push("You are not authorized to use this command.")
     if(!note) errors.push("A note is required.")
     if(!share) errors.push("A share is required.")
     
@@ -31,10 +31,10 @@ async function addFeeling(args) {
         
     
     try {
-        await client.chat.postMessage({
-            channel: channel_id,
-            text: `${feeling} ${feeling2} ${note} ${share}`
-        });
+        // await client.chat.postMessage({
+        //     channel: channel_id,
+        //     text: `${feeling} ${feeling2} ${note} ${share}`
+        // });
 
         const response = await fetch("http://localhost:3000/feelings", {
             method: "POST",
@@ -48,10 +48,35 @@ async function addFeeling(args) {
                 share: share === "true" 
             })
         });
-
+    
         const data = await response.json();
-        console.log(data);
-
+        const {category} = data;
+    
+        if (share === "true") {
+            if (category === "yellow") {
+                await client.chat.postMessage({
+                    channel: "C027Y33B93L",
+                    text: `💛 <@${user_id}> shared their feelings: they're feeling ${feeling}`
+                });
+            } else if (category === "blue") {
+                await client.chat.postMessage({
+                    channel: "C027Y33B93L",
+                    text: `💙 <@${user_id}> shared their feelings: they're feeling ${feeling}`
+                });
+            }
+            else if (category === "green") {
+                await client.chat.postMessage({
+                    channel: "C027Y33B93L",
+                    text: `💚 <@${user_id}> shared their feelings: they're feeling ${feeling}`
+                });
+            }
+            else if (category === "red") {
+                await client.chat.postMessage({
+                    channel: "C027Y33B93L",
+                    text: `🟥 <@${user_id}> shared their feelings: they're feeling ${feeling}`
+                });
+            }
+        }
       
 
         // await client.chat.postEphemeral({
@@ -61,11 +86,7 @@ async function addFeeling(args) {
         //     mrkdwn: true
         // });
     } catch (e) {
-        // await client.chat.postEphemeral({
-        //     channel: channel_id,
-        //     user: user_id,
-        //     text: `An error occured: ${e}`
-        // });
+       console.log(e)
     }
 
 }
