@@ -58,7 +58,7 @@ app.command(/.*?/, async (args) => {
             await require('./commands/removeFeeling.js')(args);
             break;
         case '/listFeeling':
-            await require('./commands/listFeeling.js')(args);
+            await require('./commands/listFeelings.js')(args);
             break;
         default:
             await respond(`I don't know how to respond to the command ${command.command}`);
