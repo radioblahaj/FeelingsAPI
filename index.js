@@ -98,11 +98,15 @@ console.log("Received new feeling:", newFeeling);
             }
         });
 
-        const categories = {category, category2}
+        const categories = category
         res.json({
-            data: categories
+            data: {
+                category: category,
+                category2: category2
+            }
         });
-        
+        console.log(category, category2)
+
     } catch (error) {
         res.status(500).json({
             status: "error",

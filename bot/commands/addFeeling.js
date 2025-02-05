@@ -50,8 +50,9 @@ async function addFeeling(args) {
         });
     
         const data = await response.json();
-        const {category} = data;
-    
+        const {category, category2} = data.data;
+
+
         if (share === "true") {
             if (category === "yellow") {
                 await client.chat.postMessage({
