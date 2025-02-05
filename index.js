@@ -109,9 +109,10 @@ console.log("Received new feeling:", newFeeling);
 });
 
 app.delete('/feelings/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
     const feeling = await prisma.feelings.delete({
         where: {
-            id: req.params.id
+            id: id
         }
     });
     res.send("Deleted feeling at ID: " + req.params.id);
