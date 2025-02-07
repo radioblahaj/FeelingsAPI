@@ -26,11 +26,12 @@ model User {
   feelings feelings[]
   friends  Friend[]
   key      String? @default("orpheus")
+  channel  String?
 }
 
 model Friend {
   id       Int     @id @default(autoincrement())
-  userId   Int
+  userId   String    
   friendId String
-  user     User    @relation(fields: [userId], references: [id])
+  user     User    @relation(fields: [userId], references: [slackId])
 }

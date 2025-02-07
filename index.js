@@ -3,6 +3,8 @@
  * 
  * API Endpoints:
  * GET /feelings/:userId/:keyword - Get feelings for a user, filtered by query params
+ * GET /feelings/date/:userId/:keyword - Get feelings for a user on a specific date
+ * GET /feelings/all/:userId/:keyword - Get all feelings for a user
  * POST /account - Create a new user account
  * POST /feelings - Create a new feeling entry
  * POST /feelings/friends - Add a friend connection
@@ -15,6 +17,8 @@ const port = 3000;
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const feelingsCategories = require("./feelingsCategories.js")
+const crypto = require("crypto");
+const chrono = require('chrono-node');
 
 
 app.use(express.json());
@@ -40,6 +44,7 @@ function getCategory(feeling) {
  * Get feelings for a user, with optional query param filters
  * @param {string} userId - The user's slack ID
  * @param {string} keyword - Authentication key
+ * @param {Object} req.query - Query parameters to filter feelings
  * @returns {Object} Filtered feelings data
  */
 app.get('/feelings/:userId/:keyword', async(req, res, next) => {
@@ -85,25 +90,115 @@ app.get('/feelings/:userId/:keyword', async(req, res, next) => {
 });
 
 /**
+ * GET /feelings/date/:userId/:keyword
+ * Get feelings for a user on a specific date
+ * @param {string} userId - The user's slack ID
+ * @param {string} keyword - Authentication key
+ * @param {string} req.query.range - Date range in natural language (e.g. "today", "yesterday")
+ * @returns {Object} Feelings for the specified date
+ */
+app.get('/feelings/date/:userId/:keyword', async (req, res) => {
+  
+    const userId = req.params.userId
+    const keyword = req.params.keyword
+
+
+    const userKey = await prisma.user.findFirst({
+        where: {
+            slackId: userId,
+            key: keyword
+        }
+    })
+
+    if (!userKey) {
+        res.status(401).send("Unauthorized")
+        return
+    }
+
+    const range = chrono.parse(req.query.range)
+    console.log(range)
+    let date = range[0].start.date()
+    console.log(date)
+
+    const feelings = await prisma.feelings.findMany({
+        where: {
+            userId: userId,
+            date: {
+               gte: "2025-02-07T22:41:58.354Z"
+            }
+        }
+    })
+
+    
+
+    console.log(feelings)
+
+    res.json({
+        data: feelings
+    })
+
+
+
+})
+
+/**
+ * GET /feelings/all/:userId/:keyword
+ * Get all feelings for a user
+ * @param {string} userId - The user's slack ID
+ * @param {string} keyword - Authentication key
+ * @returns {Object} All feelings for the user
+ */
+app.get('/feelings/all/:userId/:keyword', async (req, res) => {
+  
+    const userKey = await prisma.user.findFirst({
+        where: {
+            slackId: userId,
+            key: keyword
+        }
+    })
+
+    if (!userKey) {
+        res.status(401).send("Unauthorized")
+        return
+    }
+
+    const userId = req.params.userId
+    const keyword = req.params.keyword
+    console.log(range)
+    res.json({
+        data: range
+    })
+
+})
+
+
+
+/**
  * POST /account
  * Create a new user account
  * @param {Object} req.body
  * @param {string} req.body.userId - User's slack ID
- * @param {string} req.body.key - Authentication key
- * @returns {string} Confirmation message
+ * @param {string} req.body.channel - User's slack channel
+ * @returns {Object} Generated authentication key
  */
-
 app.post('/account', async (req, res) => {
-    const {userId, key} = req.body
+    const {userId, channel} = req.body
+    const key = crypto.randomBytes(20).toString('hex');
     const user = await prisma.user.create({
         data: {
-            slackId: userId,
-            key: key
+            slackId: userId, 
+            key: key,
+            channel: channel
         }
     })
     console.log(`Account created for ${userId}`)
-   res.send(`Account created for ${userId}`)
+   res.json({
+    data: {
+        key: key   
+    },
+   })
 })
+
 
 
 /**
@@ -178,7 +273,7 @@ console.log("Received new feeling:", newFeeling);
             }
         });
         console.log(feeling)
-
+        console.log(new Date())
 
         res.json({
             data: {
@@ -204,6 +299,7 @@ console.log("Received new feeling:", newFeeling);
  * @param {string} req.body.userId - User's slack ID
  * @param {string} req.body.friendId - Friend's slack ID
  * @param {string} req.body.key - Authentication key
+ * @returns {Object} Confirmation message
  */
 app.post('/feelings/friends', async (req, res) => {
 const {userId, friendId, key} = req.body
@@ -225,25 +321,34 @@ const addFriend = await prisma.friend.create({
         friendId: friendId
     }
 })
+
+res.json({
+    data: {
+        message: `Friend added: ${friendId}`
+    }
+})
 })
 
 /**
- * GET /feelings/friends/:userId
+ * GET /feelings/friends/:userId/:keyword
  * Get a user's friends
  * @param {string} userId - User's slack ID
+ * @param {string} keyword - Authentication key
  * @returns {Object} List of friends
  */
-app.get('/feelings/friends/:userId', async (req, res) => {
+app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
     const userId = req.params.userId
+    const keyword = req.params.keyword
     const userKey = await prisma.user.findFirst({
         where: {
             slackId: userId,
-            key: key
+            key: keyword
         }
     })
     
     if (!userKey) {
         res.status(401).send("Unauthorized")
+        return
     }
     
     const friends = await prisma.friend.findMany({
@@ -256,6 +361,7 @@ app.get('/feelings/friends/:userId', async (req, res) => {
         data: friends
     })
 })
+
 
 
 
