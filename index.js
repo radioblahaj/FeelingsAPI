@@ -12,7 +12,6 @@ app.use(express.json());
 
 function getCategory(feeling) {
     let category = ""
-    let category2 = ""
     for (let i = 0; i < feelingsCategories.length; i++) {
         if (feeling === feelingsCategories[i].feeling) {
           category = feelingsCategories[i].category
@@ -35,6 +34,7 @@ app.get('/feelings/:userId/:keyword', async(req, res, next) => {
 
     if (!userKey) {
         res.status(401).send("Unauthorized")
+        return
     }
 
     const feelings = await prisma.feelings.findMany({
