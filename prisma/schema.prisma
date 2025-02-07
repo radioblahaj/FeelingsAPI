@@ -12,8 +12,25 @@ model feelings {
   date     DateTime?
   feeling  String?
   note     String?
+  userId   String?
   feeling2 String?
   share    Boolean?  @default(false)
   category String?
   category2 String?
+  user     User?     @relation(fields: [userId], references: [slackId])
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  slackId  String    @unique
+  feelings feelings[]
+  friends  Friend[]
+  key      String? @default("orpheus")
+}
+
+model Friend {
+  id       Int     @id @default(autoincrement())
+  userId   Int
+  friendId String
+  user     User    @relation(fields: [userId], references: [id])
 }

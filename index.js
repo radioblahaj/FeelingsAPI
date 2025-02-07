@@ -3,30 +3,12 @@ const app = express();
 const port = 3000;
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const feelingsCategories = require("./feelingsCategories.js")
+
 
 app.use(express.json());
 
-const feelingsCategories = [
-    {"feeling": "happy", category: "yellow"},
-    {"feeling": "sad", category: "blue"},
-    {"feeling": "angry", category: "red"},
-    {"feeling": "anxious", category: "red"},
-    {"feeling": "excited", category: "yellow"},
-    {"feeling": "grateful", category: "yellow"},
-    {"feeling": "content", category: "green"},
-    {"feeling": "bored", category: "blue"},
-    {"feeling": "tired", category: "blue"},
-    {"feeling": "hungry", category: "red"},
-    {"feeling": "sick", category: "red"},
-    {"feeling": "nervous", category: "red"},
-    {"feeling": "stressed", category: "red"},
-    {"feeling": "anxious", category: "red"},
-    {"feeling": "depressed", category: "blue"},
-    {"feeling": "lonely", category: "blue"},
-    {"feeling": "frustrated", category: "red"},
-    {"feeling": "disappointed", category: "red"},
-    {"feeling": "disconnected", category: "blue"},
-]
+
 
 function getCategory(feeling) {
     let category = ""
@@ -39,14 +21,33 @@ function getCategory(feeling) {
     return category
   }
 
-app.get('/', (req, res) => 
-     res.send('Hello World!'));
+app.get('/feelings/:userId/:keyword', async(req, res, next) => {
+    const userId = req.params.userId
+    const keyword = req.params.keyword
+   
 
-app.get('/feelings', async(req, res, next) => {
-    const feelings = await prisma.feelings.findMany();    
+    const userKey = await prisma.user.findFirst({
+        where: {
+            slackId: userId,
+            key: keyword
+        }
+    })
+
+    if (!userKey) {
+        res.status(401).send("Unauthorized")
+    }
+
+    const feelings = await prisma.feelings.findMany({
+        where: {
+            userId: userId
+        }
+    })
+
+    console.log(feelings)
 
     const data = feelings;
     const filters = req.query;
+    console.log(filters)
     const filteredFeelings = data.filter(feeling => {
         let isValid = true;
         for (key in filters) {
@@ -61,14 +62,43 @@ app.get('/feelings', async(req, res, next) => {
     })
 });
 
+app.post('/account', async (req, res) => {
+    const {userId, key} = req.body
+    const user = await prisma.user.create({
+        data: {
+            slackId: userId,
+            key: key
+        }
+    })
+    console.log(`Account created for ${userId}`)
+    console.log(user)
+   res.send(`Account created for ${userId}`)
+})
 
 
 app.post('/feelings', async (req, res) => {
     const newFeeling = req.body;
-    const {feeling1, feeling2, note, share} = newFeeling
+
+    const {feeling1, feeling2, note, share, userId, keyword } = newFeeling
+    
+    const userKey = await prisma.user.findFirst({
+        where: {
+            slackId: userId,
+            key: keyword
+        }
+    })
+    if (!userKey) {
+        res.status(401).send("Unauthorized")
+        return
+    }
+
 
     
 console.log("Received new feeling:", newFeeling);
+ 
+  if (!userId) {
+    res.error("User ID is required");
+  }
 
   if (!newFeeling.share) {
     share = false;
@@ -96,11 +126,13 @@ console.log("Received new feeling:", newFeeling);
                 feeling2: feeling2,
                 share: share,
                 category: category,
-                category2: category2
+                category2: category2,
+                userId: userId
             }
         });
+        console.log(feeling)
 
-        
+
         res.json({
             data: {
                 category: category,
@@ -118,14 +150,52 @@ console.log("Received new feeling:", newFeeling);
     }
 });
 
-app.delete('/feelings/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
-    const feeling = await prisma.feelings.delete({
+app.post('/feelings/friends', async (req, res) => {
+const {userId, friendId, key} = req.body
+const userKey = await prisma.user.findFirst({
+    where: {
+        slackId: userId,
+        key: key
+    }
+})
+
+if (!userKey) {
+    res.status(401).send("Unauthorized")
+    return
+}
+
+const addFriend = await prisma.friend.create({
+    data: {
+        userId: userId,
+        friendId: friendId
+    }
+})
+})
+
+app.get('/feelings/friends/:userId', async (req, res) => {
+    const userId = req.params.userId
+    const userKey = await prisma.user.findFirst({
         where: {
-            id: id
+            slackId: userId,
+            key: key
         }
-    });
-    res.send("Deleted feeling at ID: " + req.params.id);
-});
+    })
+    
+    if (!userKey) {
+        res.status(401).send("Unauthorized")
+    }
+    
+    const friends = await prisma.friend.findMany({
+        where: {
+            userId: userId
+        }
+    })
+
+    res.json({
+        data: friends
+    })
+})
+
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}! http://localhost:${port}/`));

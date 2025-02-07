@@ -1,11 +1,11 @@
 require("dotenv").config();
 
 
-async function postNewFeeling(feeling1, feeling2, note, share) {
-
+async function postNewFeeling(body) {
+    const {feeling1, feeling2, note, share, userId} = body
 await client.chat.postMessage({
     channel: "C074L3A4C3E",
-    text: `💛 Alaska shared their feelings: they're feeling ${feeling}`
+    text: `💛 <@${userId}> shared their feelings: they're feeling ${feeling}`
 });
 
 }

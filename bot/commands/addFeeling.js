@@ -2,8 +2,6 @@ async function addFeeling(args) {
     const { payload, client } = args;
     const { user_id, text, channel_id } = payload;
 
-    const userInfo = await client.users.info({ user: user_id });
-    const isAdmin = userInfo.user.is_admin;
     const commands = text.split(" ");
 
     const feeling = commands[0];
@@ -11,17 +9,15 @@ async function addFeeling(args) {
     const note = commands[2];
     const share = commands[3];
 
-    //TODO: Add temporary channel banning
 
-    // // const userProfile = await client.users.profile.get({ user: userToBan });
-    // const profilePhoto = userProfile.profile.image_512;
-    // const displayName = userProfile.profile.display_name;
+    const userProfile = await client.users.profile.get({ user: user_id });
+    const profilePhoto = userProfile.profile.image_512;
+    const displayName = userProfile.profile.display_name;
 
 
     const errors = []
     if(!feeling) errors.push("A feeling is required.")
     if(!feeling2) errors.push("A feeling is required.")
-    if(!isAdmin) errors.push("You are not authorized to use this command.")
     if(!note) errors.push("A note is required.")
     if(!share) errors.push("A share is required.")
     
@@ -45,13 +41,15 @@ async function addFeeling(args) {
                 feeling1: feeling, 
                 feeling2: feeling2, 
                 note: note, 
-                share: share === "true" 
+                share: share === "true",
+                userId: user_id
             })
         });
     
         const data = await response.json();
         const {category, category2} = data.data;
         const channel = "C074L3A4C3E"
+
 
         if (share === "true") {
             if (category === "yellow") {
@@ -78,14 +76,7 @@ async function addFeeling(args) {
                 });
             }
         }
-      
 
-        // await client.chat.postEphemeral({
-        //     channel: channel_id,
-        //     user: user_id,
-        //     text: `<@${userToBan}> has been banned from all channels for ${reason}`,
-        //     mrkdwn: true
-        // });
     } catch (e) {
        console.log(e)
     }
