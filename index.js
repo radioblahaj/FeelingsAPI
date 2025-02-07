@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Express server for feelings tracking application
+ * 
+ * API Endpoints:
+ * GET /feelings/:userId/:keyword - Get feelings for a user, filtered by query params
+ * POST /account - Create a new user account
+ * POST /feelings - Create a new feeling entry
+ * POST /feelings/friends - Add a friend connection
+ * GET /feelings/friends/:userId - Get a user's friends
+ */
+
 const express = require("express");
 const app = express();
 const port = 3000;
@@ -9,7 +20,11 @@ const feelingsCategories = require("./feelingsCategories.js")
 app.use(express.json());
 
 
-
+/**
+ * Gets the category for a given feeling
+ * @param {string} feeling - The feeling to look up
+ * @returns {string} The category the feeling belongs to
+ */
 function getCategory(feeling) {
     let category = ""
     for (let i = 0; i < feelingsCategories.length; i++) {
@@ -20,6 +35,13 @@ function getCategory(feeling) {
     return category
   }
 
+/**
+ * GET /feelings/:userId/:keyword
+ * Get feelings for a user, with optional query param filters
+ * @param {string} userId - The user's slack ID
+ * @param {string} keyword - Authentication key
+ * @returns {Object} Filtered feelings data
+ */
 app.get('/feelings/:userId/:keyword', async(req, res, next) => {
     const userId = req.params.userId
     const keyword = req.params.keyword
@@ -62,6 +84,15 @@ app.get('/feelings/:userId/:keyword', async(req, res, next) => {
     })
 });
 
+/**
+ * POST /account
+ * Create a new user account
+ * @param {Object} req.body
+ * @param {string} req.body.userId - User's slack ID
+ * @param {string} req.body.key - Authentication key
+ * @returns {string} Confirmation message
+ */
+
 app.post('/account', async (req, res) => {
     const {userId, key} = req.body
     const user = await prisma.user.create({
@@ -71,11 +102,22 @@ app.post('/account', async (req, res) => {
         }
     })
     console.log(`Account created for ${userId}`)
-    console.log(user)
    res.send(`Account created for ${userId}`)
 })
 
 
+/**
+ * POST /feelings
+ * Create a new feeling entry
+ * @param {Object} req.body
+ * @param {string} req.body.feeling1 - Primary feeling
+ * @param {string} req.body.feeling2 - Secondary feeling (optional)
+ * @param {string} req.body.note - Note about the feeling (optional)
+ * @param {boolean} req.body.share - Whether feeling is shared (optional)
+ * @param {string} req.body.userId - User's slack ID
+ * @param {string} req.body.keyword - Authentication key
+ * @returns {Object} Categories for the feelings
+ */
 app.post('/feelings', async (req, res) => {
     const newFeeling = req.body;
 
@@ -100,21 +142,26 @@ console.log("Received new feeling:", newFeeling);
     res.error("User ID is required");
   }
 
-  if (!newFeeling.share) {
+  if (!share) {
     share = false;
   }
+  
+  if (!feeling1) {
+    res.error("Feeling 1 is required");
+    return
+  }
 
-  if (!newFeeling.feeling2) {
+  if (!feeling2) {
    feeling2 = null;
   }
 
-  if (!newFeeling.note) {
+  if (!note) {
     note = "";
 }
 
 
-  const category = getCategory(newFeeling.feeling1);
-  const category2 = getCategory(newFeeling.feeling2);
+  const category = getCategory(feeling1);
+  const category2 = getCategory(feeling2);
 
   
     try {
@@ -150,6 +197,14 @@ console.log("Received new feeling:", newFeeling);
     }
 });
 
+/**
+ * POST /feelings/friends
+ * Add a friend connection
+ * @param {Object} req.body
+ * @param {string} req.body.userId - User's slack ID
+ * @param {string} req.body.friendId - Friend's slack ID
+ * @param {string} req.body.key - Authentication key
+ */
 app.post('/feelings/friends', async (req, res) => {
 const {userId, friendId, key} = req.body
 const userKey = await prisma.user.findFirst({
@@ -172,6 +227,12 @@ const addFriend = await prisma.friend.create({
 })
 })
 
+/**
+ * GET /feelings/friends/:userId
+ * Get a user's friends
+ * @param {string} userId - User's slack ID
+ * @returns {Object} List of friends
+ */
 app.get('/feelings/friends/:userId', async (req, res) => {
     const userId = req.params.userId
     const userKey = await prisma.user.findFirst({
