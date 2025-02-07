@@ -51,29 +51,29 @@ async function addFeeling(args) {
     
         const data = await response.json();
         const {category, category2} = data.data;
-
+        const channel = "C074L3A4C3E"
 
         if (share === "true") {
             if (category === "yellow") {
                 await client.chat.postMessage({
-                    channel: "C027Y33B93L",
+                    channel: channel,
                     text: `💛 <@${user_id}> shared their feelings: they're feeling ${feeling}`
                 });
             } else if (category === "blue") {
                 await client.chat.postMessage({
-                    channel: "C027Y33B93L",
+                    channel: channel,
                     text: `💙 <@${user_id}> shared their feelings: they're feeling ${feeling}`
                 });
             }
             else if (category === "green") {
                 await client.chat.postMessage({
-                    channel: "C027Y33B93L",
+                    channel: channel,
                     text: `💚 <@${user_id}> shared their feelings: they're feeling ${feeling}`
                 });
             }
             else if (category === "red") {
                 await client.chat.postMessage({
-                    channel: "C027Y33B93L",
+                    channel: channel,
                     text: `🟥 <@${user_id}> shared their feelings: they're feeling ${feeling}`
                 });
             }

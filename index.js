@@ -65,20 +65,22 @@ app.get('/feelings', async(req, res, next) => {
 
 app.post('/feelings', async (req, res) => {
     const newFeeling = req.body;
+    const {feeling1, feeling2, note, share} = newFeeling
+
     
 console.log("Received new feeling:", newFeeling);
 
   if (!newFeeling.share) {
-    newFeeling.share = false;
+    share = false;
   }
 
   if (!newFeeling.feeling2) {
-    newFeeling.feeling2 = null;
+   feeling2 = null;
   }
 
   if (!newFeeling.note) {
-    newFeeling.note = "";
-  }
+    note = "";
+}
 
 
   const category = getCategory(newFeeling.feeling1);
@@ -89,16 +91,16 @@ console.log("Received new feeling:", newFeeling);
         const feeling = await prisma.feelings.create({
             data: {
                 date: new Date(),
-                feeling: newFeeling.feeling,
-                note: newFeeling.note,
-                feeling2: newFeeling.feeling2,
-                share: newFeeling.share,
+                feeling: feeling1,
+                note: note,
+                feeling2: feeling2,
+                share: share,
                 category: category,
                 category2: category2
             }
         });
 
-        const categories = category
+        
         res.json({
             data: {
                 category: category,

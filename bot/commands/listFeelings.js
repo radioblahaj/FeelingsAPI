@@ -5,12 +5,7 @@ async function listFeelings(args) {
     const userInfo = await client.users.info({ user: user_id });
     const isAdmin = userInfo.user.is_admin;
     const commands = text.split(" ");
-
-    const feeling = commands[0];
-    const feeling2 = commands[1];
-    const note = commands[2];
-    const share = commands[3];
-
+    
 
     const friendsList = [
         "U06QST7V0J2", // Eesha
@@ -31,6 +26,9 @@ async function listFeelings(args) {
         "U07346379NY", // Kess
         "U01581HFAGZ", // Alex Park
         "U059VC0UDEU", // Skyfall
+        "U06EMBJH71S", // Lou
+        "U07BHUMT6UT", // Surya
+        "U01MPHKFZ7S", // Me!
     ]
 
     // // const userProfile = await client.users.profile.get({ user: userToBan });
@@ -39,20 +37,26 @@ async function listFeelings(args) {
 
 
     const errors = []
-    if(!feeling) errors.push("A feeling is required.")
-    if(!feeling2) errors.push("A feeling is required.")
-    if(!isAdmin) errors.push("You are not authorized to use this command.")
-    if(!note) errors.push("A note is required.")
-    if(!share) errors.push("A share is required.")
+   if (!user_id in friendsList) errors.push("You are not authorized to use this command."
+   )
     
 
     if (errors.length > 0)
                 return await client.chat.postEphemeral({  user: `${user_id}`, text: errors.join("\n") });
         
-    
+    async function getFeelings() {
+        const request = await fetch("http://localhost:3000/feelings?feeling2=bored")
+        const data = await request.json()
+        console.log(data)
+        
+    }
+    getFeelings()
+
     try {
-        if (user_id in friendsList) {
+        console.log(user_id)
+        if (friendsList.includes(user_id)) {
             console.log("User is in friends list")
+           
         } else {
             console.log("User is not in friends list")
         }

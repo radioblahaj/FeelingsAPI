@@ -5,9 +5,9 @@ require("dotenv").config();
 const express = require('express')
 
 
-// const receiver = new ExpressReceiver({
-//   signingSecret: process.env.SLACK_SIGNING_SECRET,
-// })
+const receiver = new ExpressReceiver({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+})
 
 
 const app = new App({
@@ -32,18 +32,6 @@ const app = new App({
 
 
 
-app.event('message', async (args) => {
-    // begin the firehose
-    const { body, client } = args
-    const { event } = body
-    const { type, subtype, user, channel, ts, text } = event
-
-  
-
-});
-
-
-
 app.command(/.*?/, async (args) => {
 
     const { ack, command, respond } = args;
@@ -57,7 +45,7 @@ app.command(/.*?/, async (args) => {
         case '/removeFeeling':
             await require('./commands/removeFeeling.js')(args);
             break;
-        case '/listFeeling':
+        case '/listfeelings':
             await require('./commands/listFeelings.js')(args);
             break;
         default:
