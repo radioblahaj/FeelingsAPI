@@ -537,13 +537,11 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
         return groups;
     }, {});
 
-    
+
     return res.json({
         data: groupedFeelings
     });
-    res.json({
-        data: allFriendsFeelings
-    })
+  
 })
 
 
