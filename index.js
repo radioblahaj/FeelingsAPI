@@ -523,7 +523,6 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
         )
     )
 
-    friendsFeelings.group
 
     // Flatten the array of arrays into a single array of feelings
     const allFriendsFeelings = friendsFeelings.flat()
