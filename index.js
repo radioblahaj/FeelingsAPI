@@ -260,17 +260,10 @@ app.post('/account', async (req, res) => {
  * @param {string} keyword - Authentication key
  * @returns {Object} User account data
  */
-
-app.get('/account/:userId/:keyword'), async (req, res) => {
+app.get('/account/:userId/:keyword', async (req, res) => {
     const userId = req.params.userId
     const keyword = req.params.keyword
     const category = req.query.category
-
-
-    if (!category) {
-        res.status(400).send("No category provided")
-        return
-    }
 
 
     const userKey = await prisma.user.findFirst({
@@ -324,7 +317,7 @@ app.get('/account/:userId/:keyword'), async (req, res) => {
             feelingsByCategory: feelingsByCategory
         }
     })
-}
+})
 
 
 /**
@@ -517,11 +510,25 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
             userId: userId
         }
     })
+   
+    // AI wrote this part
+    const friendsFeelings = await Promise.all(
+        friends.map(friend => 
+            prisma.feelings.findMany({
+                where: {
+                    userId: friend.friendId,
+                    share: true
+                }
+            })
+        )
+    )
+
+    // Flatten the array of arrays into a single array of feelings
+    const allFriendsFeelings = friendsFeelings.flat()
 
     res.json({
-        data: friends
+        data: allFriendsFeelings
     })
-
 })
 
 
