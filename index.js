@@ -126,69 +126,67 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
 
 
 
-
-  
     if (range === "today") {
 
         let date = parsedRange[0].start.date()
-        let yesterday =  chrono.parse("Yesterday")
+        let yesterday = chrono.parse("Yesterday")
         console.log(yesterday[0].start.date())
         let tomorrow = chrono.parse("Tomorrow")
         console.log(tomorrow[0].start.date())
-        
-    const feelings = await prisma.feelings.findMany({
-        where: {
-            userId: userId,
-            date: {
-                gte: yesterday[0].start.date(),
-                lte: tomorrow[0].start.date()
+
+        const feelings = await prisma.feelings.findMany({
+            where: {
+                userId: userId,
+                date: {
+                    gte: yesterday[0].start.date(),
+                    lte: tomorrow[0].start.date()
+                }
             }
-        }
-    })
-    return res.json({
-        data: feelings
-    })
+        })
+        return res.json({
+            data: feelings
+        })
     } else if (range === "yesterday") {
         let date = parsedRange[0].start.date()
-        let yesterday =  chrono.parse("Yesterday")
+        let yesterday = chrono.parse("Yesterday")
         console.log(yesterday[0].start.date())
         let tomorrow = chrono.parse("Tomorrow")
         console.log(tomorrow[0].start.date())
-        
-    const feelings = await prisma.feelings.findMany({
-        where: {
-            userId: userId,
-            date: {
-                gte: yesterday[0].start.date(),
-                lte: tomorrow[0].start.date()
+
+        const feelings = await prisma.feelings.findMany({
+            where: {
+                userId: userId,
+                date: {
+                    gte: yesterday[0].start.date(),
+                    lte: tomorrow[0].start.date()
+                }
             }
-        }
-    })
-    return res.json({
-        data: feelings
-    })
+        })
+        return res.json({
+            data: feelings
+        })
 
     } else if (range === "week") {
-        let yesterday =  chrono.parse("Yesterday")
+        let yesterday = chrono.parse("Yesterday")
         console.log(yesterday[0].start.date())
         let today = chrono.parse("Today")
         let lastWeek = chrono.parse("Last week")
         console.log(today[0].start.date())
         let tomorrow = chrono.parse("Tomorrow")
         console.log(tomorrow[0].start.date())
-        
-    const feelings = await prisma.feelings.findMany({
-        where: {
-            userId: userId,
-            date: {
-                gte: lastWeek[0].start.date(),
-                lte: tomorrow[0].start.date()
+
+        const feelings = await prisma.feelings.findMany({
+            where: {
+                userId: userId,
+                date: {
+                    gte: lastWeek[0].start.date(),
+                    lte: tomorrow[0].start.date()
+                }
             }
-        }
-    })
-    return res.json({
-        data: feelings
-    })
+        })
+        return res.json({
+            data: feelings
+        })
 
     } else if (range === "month") {
 
@@ -239,7 +237,7 @@ app.get('/feelings/all/:userId/:keyword', async (req, res) => {
 app.post('/account', async (req, res) => {
     const { userId, channel } = req.body
     const key = crypto.randomBytes(20).toString('hex');
-    
+
     const user = await prisma.user.create({
         data: {
             slackId: userId,
@@ -250,7 +248,7 @@ app.post('/account', async (req, res) => {
     console.log(`Account created for ${userId}`)
     res.json({
         data: {
-            key: key 
+            key: key
         },
     })
 })
@@ -294,7 +292,7 @@ app.get('/account/:userId/:keyword'), async (req, res) => {
             category: category
         }
     })
-    
+
     const user = await prisma.user.findFirst({
         where: {
             slackId: userId
