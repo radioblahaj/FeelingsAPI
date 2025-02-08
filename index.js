@@ -523,9 +523,24 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
         )
     )
 
+    friendsFeelings.group
+
     // Flatten the array of arrays into a single array of feelings
     const allFriendsFeelings = friendsFeelings.flat()
 
+    // Group feelings by user ID
+    const groupedFeelings = allFriendsFeelings.reduce((groups, feeling) => {
+        if (!groups[feeling.userId]) {
+            groups[feeling.userId] = [];
+        }
+        groups[feeling.userId].push(feeling);
+        return groups;
+    }, {});
+
+    
+    return res.json({
+        data: groupedFeelings
+    });
     res.json({
         data: allFriendsFeelings
     })
