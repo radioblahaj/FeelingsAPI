@@ -9,7 +9,7 @@ To use the API, you'll need:
 - Your secret key (`keyword`)
 
 ## Base URL
-`http://localhost:3000`
+`http://api.blahaj.diy`
 
 ## Endpoints
 
@@ -20,15 +20,13 @@ To use the API, you'll need:
 
 Creates a new user account and returns your secret key.
 
-**Curl Example:**
-```bash
-curl -X POST http://localhost:3000/account \
+**Curl Example:**```bash
+curl -X POST http://api.blahaj.diy/account \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "your_slack_id",
     "channel": "your_slack_channel"
-  }'
-```
+  }'```
 
 **Request Body:**
 ```json
@@ -52,9 +50,8 @@ curl -X POST http://localhost:3000/account \
 
 Gets your account information, including total feelings and friends count.
 
-**Curl Example:**
-```bash
-curl "http://localhost:3000/account?userId=your_slack_id&keyword=your_secret_key"
+**Curl Example:**```bash
+curl "http://api.blahaj.diy/account?userId=your_slack_id&keyword=your_secret_key"
 ```
 
 **Response:**
@@ -78,7 +75,7 @@ Records a new feeling entry.
 
 **Curl Example:**
 ```bash
-curl -X POST http://localhost:3000/feelings \
+curl -X POST http://api.blahaj.diy/feelings \
   -H "Content-Type: application/json" \
   -d '{
     "feeling1": "happy",
@@ -87,8 +84,7 @@ curl -X POST http://localhost:3000/feelings \
     "share": true,
     "userId": "your_slack_id",
     "keyword": "your_secret_key"
-  }'
-```
+  }'```
 
 **Request Body:**
 ```json
@@ -121,7 +117,7 @@ Returns all your recorded feelings.
 
 **Curl Example:**
 ```bash
-curl "http://localhost:3000/feelings/all/your_slack_id/your_secret_key"
+curl "http://api.blahaj.diy/feelings/all/your_slack_id/your_secret_key"
 ```
 
 #### Get Recent Feelings
@@ -131,7 +127,7 @@ Returns your feelings with optional filters.
 
 **Curl Example:**
 ```bash
-curl "http://localhost:3000/feelings/your_slack_id/your_secret_key?category=positive"
+curl "http://api.blahaj.diy/feelings/your_slack_id/your_secret_key?category=positive"
 ```
 
 **Query Parameters:**
@@ -144,7 +140,7 @@ Get feelings for a specific time period.
 
 **Curl Example:**
 ```bash
-curl "http://localhost:3000/feelings/date/your_slack_id/your_secret_key?range=week"
+curl "http://api.blahaj.diy/feelings/date/your_slack_id/your_secret_key?range=week"
 ```
 
 **Time Ranges:**
@@ -160,7 +156,7 @@ Returns your most recent feeling entry.
 
 **Curl Example:**
 ```bash
-curl "http://localhost:3000/feelings/last/your_slack_id/your_secret_key"
+curl "http://api.blahaj.diy/feelings/last/your_slack_id/your_secret_key"
 ```
 
 ### Friend Management
@@ -172,7 +168,7 @@ Add a new friend connection.
 
 **Curl Example:**
 ```bash
-curl -X POST http://localhost:3000/account/friends \
+curl -X POST http://api.blahaj.diy/account/friends \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "your_slack_id",
@@ -197,7 +193,7 @@ Returns list of your friends.
 
 **Curl Example:**
 ```bash
-curl "http://localhost:3000/account/friends/your_slack_id/your_secret_key"
+curl "http://api.blahaj.diy/account/friends/your_slack_id/your_secret_key"
 ```
 
 #### View Friends' Shared Feelings
@@ -207,7 +203,7 @@ Returns feelings that your friends have shared.
 
 **Curl Example:**
 ```bash
-curl "http://localhost:3000/feelings/friends/your_slack_id/your_secret_key"
+curl "http://api.blahaj.diy/feelings/friends/your_slack_id/your_secret_key"
 ```
 
 ### Update Account
@@ -219,7 +215,7 @@ Update your authentication key.
 
 **Curl Example:**
 ```bash
-curl -X POST http://localhost:3000/account/information/update \
+curl -X POST http://api.blahaj.diy/account/information/update \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "your_slack_id",
@@ -240,3 +236,6 @@ curl -X POST http://localhost:3000/account/information/update \
 
 
 Need help? Visit our [GitHub repository](https://github.com/radioblahaj/YouFeelWeFeel) for more information.
+
+
+
