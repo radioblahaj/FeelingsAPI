@@ -189,7 +189,21 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
         })
 
     } else if (range === "month") {
+        let last_month = chrono.parse("Last Month")
+        let tomorrow = chrono.parse("Tomorrow")
 
+        const feelings = await prisma.feelings.findMany({
+            where: {
+                userId: userId,
+                date: {
+                    gte: last_month[0].start.date(),
+                    lte: tomorrow[0].start.date()
+                }
+            }
+        })
+        return res.json({
+            data: feelings
+        })
 
     } else if (range === "year") {
 
@@ -448,6 +462,39 @@ app.post('/account/friends', async (req, res) => {
     })
 })
 
+app.post('/account/information/update', async (req, res) => {
+    const { userId, key, newKey } = req.body
+
+    const userKey = await prisma.user.findFirst({
+        where: {
+            slackId: userId,
+            key: key
+        }
+    })
+
+    if (!userKey) {
+        res.status(401).send("Unauthorized")
+        return
+    }
+
+    const updateRecord = await prisma.user.update({
+        where: {
+            slackId: userId,
+            key: key
+        },
+        data: {
+            key: newKey
+        }
+    })
+
+    return res.json({
+        data: newKey
+    })
+
+
+
+})
+
 /**
  * GET /account/friends/:userId/:keyword
  * Get a user's friends
@@ -510,10 +557,10 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
             userId: userId
         }
     })
-   
+
     // AI wrote this part
     const friendsFeelings = await Promise.all(
-        friends.map(friend => 
+        friends.map(friend =>
             prisma.feelings.findMany({
                 where: {
                     userId: friend.friendId,
@@ -540,7 +587,7 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
     return res.json({
         data: groupedFeelings
     });
-  
+
 })
 
 
