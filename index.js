@@ -23,6 +23,7 @@ const crypto = require("crypto");
 const chrono = require('chrono-node');
 
 
+
 app.use(express.json());
 
 
@@ -96,7 +97,7 @@ app.get('/feelings/:userId/:keyword', async (req, res, next) => {
     })
 });
 
-app.get('/feelings/:userId/:keyword/last', async (req, res, next) => {
+app.get('/feelings/last/:userId/:keyword', async (req, res, next) => {
     const userId = req.params.userId
     const keyword = req.params.keyword
 
@@ -237,9 +238,6 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
         return res.json({
             data: feelings
         })
-
-    } else if (range === "year") {
-
     }
 })
 
@@ -251,6 +249,10 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
  * @returns {Object} All feelings for the user
  */
 app.get('/feelings/all/:userId/:keyword', async (req, res) => {
+    
+    try {
+    const userId = req.params.userId
+    const keyword = req.params.keyword
 
     const userKey = await prisma.user.findFirst({
         where: {
@@ -264,13 +266,15 @@ app.get('/feelings/all/:userId/:keyword', async (req, res) => {
         return
     }
 
-    const userId = req.params.userId
-    const keyword = req.params.keyword
+   
     console.log(range)
     res.json({
         data: range
     })
+} catch(e) {
 
+    console.error(e)
+}
 })
 
 /**
@@ -293,10 +297,11 @@ app.post('/account', async (req, res) => {
         }
     })
     console.log(`Account created for ${userId}`)
+    console.log(user)
     res.json({
         data: {
             key: key
-        },
+        }
     })
 })
 
@@ -307,9 +312,9 @@ app.post('/account', async (req, res) => {
  * @param {string} keyword - Authentication key
  * @returns {Object} User account data
  */
-app.get('/account/:userId/:keyword', async (req, res) => {
-    const userId = req.params.userId
-    const keyword = req.params.keyword
+app.get('/account', async (req, res) => {
+    const userId = req.query.userId
+    const keyword = req.query.keyword
     const category = req.query.category
 
 
@@ -323,6 +328,10 @@ app.get('/account/:userId/:keyword', async (req, res) => {
     if (!userKey) {
         res.status(401).send("Unauthorized")
         return
+    }
+
+    if (!category) {
+        res.status
     }
 
 
@@ -345,7 +354,7 @@ app.get('/account/:userId/:keyword', async (req, res) => {
         }
     })
 
-    const friends = await prisma.friend.findMany({
+    const friends = await prisma.user.findMany({
         where: {
             userId: userId
         }
@@ -379,6 +388,8 @@ app.get('/account/:userId/:keyword', async (req, res) => {
  * @param {string} req.body.keyword - Authentication key
  * @returns {Object} Categories for the feelings
  */
+
+
 app.post('/feelings', async (req, res) => {
     const newFeeling = req.body;
 
@@ -455,6 +466,7 @@ app.post('/feelings', async (req, res) => {
             message: "Failed to save feeling",
             error: error.message
         });
+        console.error(error.message)
     }
 });
 
@@ -496,7 +508,7 @@ app.post('/account/friends', async (req, res) => {
 })
 
 app.post('/account/information/update', async (req, res) => {
-    const { userId, key, newKey, random} = req.body
+    const { userId, key, newKey, random } = req.body
 
     const userKey = await prisma.user.findFirst({
         where: {
@@ -513,7 +525,7 @@ app.post('/account/information/update', async (req, res) => {
         res.status(401).send("Unauthorized")
         return
     }
-    
+
 
     const updateRecord = await prisma.user.update({
         where: {
@@ -629,4 +641,4 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
 })
 
 
-app.listen(port, () => console.log(`Example app listening on port ${port}! http://localhost:${port}/`));
+app.listen(port, () => console.log(`You Feel We Feel running ${port}! http://localhost:${port}/`));

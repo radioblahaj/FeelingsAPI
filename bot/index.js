@@ -42,8 +42,8 @@ app.command(/.*?/, async (args) => {
         case '/addfeeling' :
             await require('./commands/addFeeling.js')(args);
             break;
-        case '/removeFeeling':
-            await require('./commands/removeFeeling.js')(args);
+        case '/makeaccount':
+            await require('./commands/makeAccount.js')(args);
             break;
         case '/listfeelings':
             await require('./commands/listFeelings.js')(args);

@@ -6,8 +6,9 @@ async function addFeeling(args) {
 
     const feeling = commands[0];
     const feeling2 = commands[1];
-    const note = commands[2];
+    const note = commands[2]
     const share = commands[3];
+    const key = commands[4];
 
 
     const userProfile = await client.users.profile.get({ user: user_id });
@@ -42,7 +43,8 @@ async function addFeeling(args) {
                 feeling2: feeling2, 
                 note: note, 
                 share: share === "true",
-                userId: user_id
+                userId: user_id,
+                key: "your-secret-key"
             })
         });
     
