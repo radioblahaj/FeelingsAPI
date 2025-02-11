@@ -3,13 +3,15 @@
  * 
  * API Endpoints:
  * GET /feelings/:userId/:keyword - Get feelings for a user, filtered by query params
+ * GET /feelings/last/:userId/:keyword - Get user's most recent feeling
  * GET /feelings/date/:userId/:keyword - Get feelings for a user on a specific date
  * GET /feelings/all/:userId/:keyword - Get all feelings for a user
- * POST /account - Create a new user account
+ * GET /feelings/friends/:userId/:keyword - Get feelings shared by friends
  * POST /feelings - Create a new feeling entry
+ * POST /account - Create a new user account
+ * GET /account - Get a user's account information
  * POST /account/friends - Add a friend connection
  * GET /account/friends/:userId/:keyword - Get a user's friends
- * GET /feelings/friends/:userId/:keyword - Get feelings shared by friends
  * POST /account/information/update - Update user's secret key
  */
 
@@ -306,11 +308,12 @@ app.post('/account', async (req, res) => {
 })
 
 /**
- * GET /account/:userId/:keyword
+ * GET /account
  * Get a user's account information
- * @param {string} userId - The user's slack ID
- * @param {string} keyword - Authentication key
- * @returns {Object} User account data
+ * @param {string} req.query.userId - The user's slack ID
+ * @param {string} req.query.keyword - Authentication key
+ * @param {string} req.query.category - Optional category to filter feelings count
+ * @returns {Object} User account data including total feelings, friends, and feelings by category
  */
 app.get('/account', async (req, res) => {
     const userId = req.query.userId
@@ -583,7 +586,7 @@ app.get('/account/friends/:userId/:keyword', async (req, res) => {
  * Get feelings shared by friends
  * @param {string} userId - User's slack ID
  * @param {string} keyword - Authentication key
- * @returns {Object} List of feelings shared by friends
+ * @returns {Object} List of feelings shared by friends, grouped by user ID
 */
 
 app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
