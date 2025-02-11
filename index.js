@@ -10,6 +10,7 @@
  * POST /account/friends - Add a friend connection
  * GET /account/friends/:userId/:keyword - Get a user's friends
  * GET /feelings/friends/:userId/:keyword - Get feelings shared by friends
+ * POST /account/information/update - Update user's secret key
  */
 
 const express = require("express");
@@ -94,6 +95,38 @@ app.get('/feelings/:userId/:keyword', async (req, res, next) => {
         data: filteredFeelings
     })
 });
+
+app.get('/feelings/:userId/:keyword/last', async (req, res, next) => {
+    const userId = req.params.userId
+    const keyword = req.params.keyword
+
+
+    const userKey = await prisma.user.findFirst({
+        where: {
+            slackId: userId,
+            key: keyword
+        }
+    })
+
+    if (!userKey) {
+        res.status(401).send("Unauthorized")
+        return
+    }
+
+    const feelings = await prisma.feelings.findFirst({
+        where: {
+            userId: userId
+        }
+    })
+
+    console.log(feelings)
+
+    res.json({
+        data: feelings
+    })
+});
+
+
 
 /**
  * GET /feelings/date/:userId/:keyword
@@ -463,7 +496,7 @@ app.post('/account/friends', async (req, res) => {
 })
 
 app.post('/account/information/update', async (req, res) => {
-    const { userId, key, newKey } = req.body
+    const { userId, key, newKey, random} = req.body
 
     const userKey = await prisma.user.findFirst({
         where: {
@@ -472,10 +505,15 @@ app.post('/account/information/update', async (req, res) => {
         }
     })
 
+    if (random = true) {
+        const newKey = crypto.randomBytes(20).toString('hex');
+    }
+
     if (!userKey) {
         res.status(401).send("Unauthorized")
         return
     }
+    
 
     const updateRecord = await prisma.user.update({
         where: {
