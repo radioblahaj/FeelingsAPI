@@ -100,7 +100,7 @@ try {
     })
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 });
@@ -135,7 +135,7 @@ app.get('/feelings/last/:userId/:keyword', async (req, res, next) => {
     })
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 });
@@ -254,7 +254,7 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
     }
     } catch(e) {
         console.error(e)
-        res.error(e)
+        res.status(500).json({ error: e.message })
         return
     }
 })
@@ -290,8 +290,8 @@ app.get('/feelings/all/:userId/:keyword', async (req, res) => {
         data: range
     })
 } catch(e) {
-
     console.error(e)
+    res.status(500).json({ error: e.message })
 }
 })
 
@@ -324,7 +324,7 @@ app.post('/account', async (req, res) => {
     })
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 })
@@ -400,7 +400,7 @@ try {
     })
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 })
@@ -442,7 +442,8 @@ app.post('/feelings', async (req, res) => {
     console.log("Received new feeling:", newFeeling);
 
     if (!userId) {
-        res.error("User ID is required");
+        res.status(400).json({ error: "User ID is required" });
+        return;
     }
 
     if (!share) {
@@ -450,8 +451,8 @@ app.post('/feelings', async (req, res) => {
     }
 
     if (!feeling1) {
-        res.error("Feeling 1 is required");
-        return
+        res.status(400).json({ error: "Feeling 1 is required" });
+        return;
     }
 
     if (!feeling2) {
@@ -501,7 +502,7 @@ app.post('/feelings', async (req, res) => {
     }
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 });
@@ -545,7 +546,7 @@ app.post('/account/friends', async (req, res) => {
     })
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 })
@@ -586,7 +587,7 @@ app.post('/account/information/update', async (req, res) => {
     })
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 })
@@ -626,7 +627,7 @@ app.get('/account/friends/:userId/:keyword', async (req, res) => {
     })
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 })
@@ -696,7 +697,7 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
     });
 } catch(e) {
     console.error(e)
-    res.error(e)
+    res.status(500).json({ error: e.message })
     return
 }
 })
