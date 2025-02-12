@@ -17,12 +17,13 @@
 
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 1234;
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const feelingsCategories = require("./feelingsCategories.js")
 const crypto = require("crypto");
 const chrono = require('chrono-node');
+const { channel } = require("diagnostics_channel");
 
 
 
@@ -423,7 +424,7 @@ try {
 app.post('/feelings', async (req, res) => {
     const newFeeling = req.body;
 
-    const { feeling1, feeling2, note, share, userId, keyword } = newFeeling
+    let { feeling1, feeling2, note, share, userId, keyword } = newFeeling
 
     try {
     const userKey = await prisma.user.findFirst({
@@ -432,6 +433,8 @@ app.post('/feelings', async (req, res) => {
             key: keyword
         }
     })
+
+    const channel = userKey.channel
     if (!userKey) {
         res.status(401).send("Unauthorized")
         return
@@ -483,6 +486,26 @@ app.post('/feelings', async (req, res) => {
         });
         console.log(feeling)
         console.log(new Date())
+
+        try {
+            const sendToSlack = await fetch("https://82ab-99-245-95-215.ngrok-free.app/new-feeling", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ 
+                    feeling1: feeling1,
+                    feeling2: feeling2,
+                    note: note,
+                    share: (share === "true") ? share = true : share = false,
+                    userId: userId,
+                    channel: channel
+                })
+            });
+            const response = await sendToSlack.json();
+        } catch (error) {
+            console.error("Error sending to Slack:", error);
+        }
 
         res.json({
             data: {
@@ -550,6 +573,8 @@ app.post('/account/friends', async (req, res) => {
     return
 }
 })
+
+
 
 app.post('/account/information/update', async (req, res) => {
     const { userId, key, newKey, random } = req.body
@@ -703,4 +728,4 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
 })
 
 
-app.listen(port, () => console.log(`You Feel We Feel running ${port}! http://localhost:${port}/`));
+app.listen(1234, () => console.log(`You Feel We Feel running ${port}! http://localhost:${port}/`));

@@ -27,6 +27,7 @@ model User {
   friends  Friend[]
   key      String? @default("orpheus")
   channel  String?
+  habits    Habit[]
 }
 
 model Friend {
@@ -35,3 +36,11 @@ model Friend {
   friendId String
   user     User    @relation(fields: [userId], references: [slackId])
 }
+
+model Habit {
+  id       Int     @id @default(autoincrement())
+  habit    String
+  userId   String
+  user     User    @relation(fields: [userId], references: [slackId])
+}
+

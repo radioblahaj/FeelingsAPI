@@ -4,23 +4,27 @@ require("dotenv").config();
 // const prisma = getPrisma();
 const express = require('express')
 
-
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 })
 
+const {postNewFeeling} = require('./interactions/postNewFeeling')
+
+
+
+receiver.router.use(express.json())
+receiver.router.get('/ping', require('./endpoints/ping'))
+receiver.router.post('/new-feeling', require('./endpoints/getNewFeeling'))
 
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     signingSecret: process.env.SLACK_SIGNING_SECRET,
-    // receiver,
-    socketMode: true,
-    appToken: process.env.SLACK_APP_TOKEN,
-    // Using socket mode, however we still want for it to reply to OAuth
+    receiver,
+    // socketMode: true,
+    // appToken: process.env.SLACK_APP_TOKEN,
     port: process.env.PORT || 3000,
 });
 
-// receiver.router.use(express.json())
 // receiver.router.get('/', require('./endpoints/index'))
 // receiver.router.get('/ping', require('./endpoints/ping'))
 
@@ -58,6 +62,6 @@ app.command(/.*?/, async (args) => {
 
 // Start the app on the specified port
 // const port = process.env.PORT || 3000; // Get the port from environment variable or default to 3000
-app.start().then(() => {
+app.start(process.env.PORT || 3000).then(() => {
     app.logger.info(`Bolt is running!}`)
 });
