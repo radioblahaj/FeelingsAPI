@@ -7,7 +7,7 @@ async function addFeeling(args) {
     const feeling = commands[0];
     const feeling2 = commands[1];
     const note = commands[2]
-    const share = commands[3];
+    let share = commands[3];
     const key = commands[4];
 
 
@@ -33,7 +33,7 @@ async function addFeeling(args) {
         //     text: `${feeling} ${feeling2} ${note} ${share}`
         // });
 
-        const response = await fetch("http://localhost:3000/feelings", {
+        const response = await fetch("https://api.blahaj.diy/feelings", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -42,18 +42,19 @@ async function addFeeling(args) {
                 feeling1: feeling, 
                 feeling2: feeling2, 
                 note: note, 
-                share: share === "true",
+                share: (share === "true") ? share = true : share = false,
                 userId: user_id,
-                key: "your-secret-key"
+                key: key
             })
         });
     
         const data = await response.json();
+        console.log(data)
         const {category, category2} = data.data;
         const channel = "C074L3A4C3E"
 
 
-        if (share === "true") {
+        if (share) {
             if (category === "yellow") {
                 await client.chat.postMessage({
                     channel: channel,
