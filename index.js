@@ -688,6 +688,9 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
     }, {});
 
 
+
+
+
     return res.json({
         data: groupedFeelings
     });
