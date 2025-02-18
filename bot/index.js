@@ -35,6 +35,7 @@ receiver.router.get('/ping', require('./endpoints/ping'))
 // })
 
 
+
 // Listen for users opening your App Home
 app.event('app_home_opened', async ({ event, client, logger }) => {
     try {
