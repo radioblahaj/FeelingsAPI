@@ -1,16 +1,13 @@
-
-const fs = require("fs");
 const path = require("path");
 
-const eventsDir = path.resolve(__dirname, "./events");
-// Dynamically import and handle events
-module.exports = async function handleEvent({ event, client, body, say }) {
+async function handleEvent({ event, client, body, say }) {
   try {
     const eventName = event.type;
-    const eventFile = path.join(eventsDir, `${eventName}.js`);
+    const eventFile = path.resolve(__dirname, `${eventName}.js`);
 
-    if (fs.existsSync(eventFile)) {
-      const { default: eventHandler } = await import(`./events/${eventName}.js`);
+    // Dynamically require event handlers
+    const eventHandler = require(eventFile);
+    if (eventHandler) {
       await eventHandler({ event, client, body, say });
     } else {
       console.warn(`No handler found for event: ${eventName}`);
@@ -19,3 +16,5 @@ module.exports = async function handleEvent({ event, client, body, say }) {
     console.error(`Error handling event ${event.type}:`, error);
   }
 }
+
+module.exports = handleEvent;
