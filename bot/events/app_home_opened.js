@@ -1,4 +1,4 @@
-module.exports = async function appHomeOpened({ event, client, body, say }) {
+module.exports = async function appHomeOpened({ event, client, body, say, logger }) {
     try {
             try {
               // Call views.publish with the built-in client

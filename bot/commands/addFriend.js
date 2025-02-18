@@ -1,6 +1,7 @@
 async function addFriend(args) {
     const { payload, client, logger, ack, body } = args;
     const { user_id, text, channel_id } = payload;
+
     const commands = text.split(" ");
     const friendId = commands[1]
     
@@ -54,22 +55,36 @@ async function addFriend(args) {
                             "text": "What is your Key?",
                             "emoji": true
                         }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Add Friend",
+                                    "emoji": true
+                                },
+                                "value": "click_me_123",
+                                "action_id": "add_friend"
+                            }
+                        ]
                     }
                 ],
             submit: {
               type: 'plain_text',
               text: 'Submit',
-              action_id: 'user_adds_friend'
             }
           }
         });
-        logger.info(result);
+        logger.info("hi" + result);
 
         
       }
 
       catch (error) {
-        logger.error(error);
+        logger.error("hi! \n" + error);
       }
 
     // try {

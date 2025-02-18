@@ -9,6 +9,7 @@ const receiver = new ExpressReceiver({
 })
 
 const handleEvent = require("./events/index.js");
+const handleAction = require("./actions/index.js")
 
 receiver.router.use(express.json())
 receiver.router.get('/ping', require('./endpoints/ping'))
@@ -33,7 +34,7 @@ receiver.router.get('/ping', require('./endpoints/ping'))
 // })
 
 app.event(/.*/, handleEvent); // Catch all events dynamically
-
+app.action(/.*/, handleAction) // Catch all actions dynamically
 
 app.command(/.*?/, async (args) => {
 
