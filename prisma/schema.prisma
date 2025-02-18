@@ -42,5 +42,8 @@ model Habit {
   habit    String
   userId   String
   user     User    @relation(fields: [userId], references: [slackId])
+  goal     String?
+  length   String?
+  frequency String?
 }
 

@@ -574,8 +574,6 @@ app.post('/account/friends', async (req, res) => {
 }
 })
 
-
-
 app.post('/account/information/update', async (req, res) => {
     const { userId, key, newKey, random } = req.body
 
@@ -726,6 +724,74 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
     return
 }
 })
+
+app.post('/habits', async (req, res) => {
+    const { userId, keyword, habit, goal, length } = req.body
+
+    try {
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
+    
+    if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+
+    const createHabit = await prisma.habit.create({
+        data: {
+            userId: userId,
+            habit: habit,
+        }
+    })
+
+    return res.json({
+        data: createHabit
+    })
+
+    } catch(e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
+        return
+    }   
+})
+
+app.get('/habits/:userId/:keyword', async (req, res) => {
+    const userId = req.params.userId
+    const keyword = req.params.keyword
+
+    try {
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
+    
+    if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+    const getHabit = await prisma.habit.findMany({
+        where:{
+            userId: userId
+        }
+    })   
+    
+    return res.json({
+        data: getHabit
+    })
+
+    } catch(e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
+        return
+    }
+})
+
 
 
 app.listen(1234, () => console.log(`You Feel We Feel running ${port}! http://localhost:${port}/`));

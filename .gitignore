@@ -7,3 +7,9 @@ prisma/db.sqlite-journal
 prisma/*.db
 
 prisma/dev.db
+prisma/dev.db
+prisma/dev.db-journal
+prisma/schema.prisma
+prisma/migrations/20250212051844_h/migration.sql
+prisma/migrations/20250212141853_a/migration.sql
+prisma/dev.db

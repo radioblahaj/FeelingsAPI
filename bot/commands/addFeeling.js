@@ -46,8 +46,9 @@ async function addFeeling(args) {
                 userId: user_id,
                 key: key
             })
-        });
     
+        });
+        
         const data = await response.json();
         console.log(data)
         const {category, category2} = data.data;
@@ -76,6 +77,12 @@ async function addFeeling(args) {
                 await client.chat.postMessage({
                     channel: channel,
                     text: `🟥 <@${user_id}> shared their feelings: they're feeling ${feeling}`
+                });
+            }
+            else {
+                await client.chat.postMessage({
+                    channel: channel,
+                    text: `💜 <@${user_id}> shared their feelings: they're feeling ${feeling}`
                 });
             }
         }
