@@ -25,8 +25,9 @@ const app = new App({
     port: process.env.PORT || 3000,
 });
 
-// receiver.router.get('/', require('./endpoints/index'))
-// receiver.router.get('/ping', require('./endpoints/ping'))
+receiver.router.get('/', require('./endpoints/index'))
+receiver.router.get('/ping', require('./endpoints/ping'))
+
 
 // app.client.chat.postMessage({
 //     channel: "C074L3A4C3E",
@@ -34,7 +35,41 @@ const app = new App({
 // })
 
 
-
+// Listen for users opening your App Home
+app.event('app_home_opened', async ({ event, client, logger }) => {
+    try {
+      // Call views.publish with the built-in client
+      const result = await client.views.publish({
+        // Use the user ID associated with the event
+        user_id: event.user,
+        view: {
+          // Home tabs must be enabled in your app configuration page under "App Home"
+          type: "home",
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "*Welcome home, <@" + event.user + "> :house:*"
+              }
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "Learn how home tabs can be more useful and interactive <https://api.slack.com/surfaces/tabs/using|*in the documentation*>."
+              }
+            }
+          ]
+        }
+      });
+  
+      logger.info(result);
+    }
+    catch (error) {
+      logger.error(error);
+    }
+  });
 
 app.command(/.*?/, async (args) => {
 
@@ -49,8 +84,8 @@ app.command(/.*?/, async (args) => {
         case '/makeaccount':
             await require('./commands/makeAccount.js')(args);
             break;
-        case '/listfeelings':
-            await require('./commands/listFeelings.js')(args);
+        case '/addfriend':
+            await require('./commands/addFriend.js')(args);
             break;
         default:
             await respond(`I don't know how to respond to the command ${command.command}`);
@@ -58,6 +93,8 @@ app.command(/.*?/, async (args) => {
     }
 
 })
+
+app.action("add_friend", )
 
 
 // Start the app on the specified port
