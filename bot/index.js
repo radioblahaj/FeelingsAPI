@@ -94,7 +94,7 @@ app.command(/.*?/, async (args) => {
 
 })
 
-app.action("add_friend", )
+
 
 
 // Start the app on the specified port
