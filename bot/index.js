@@ -53,7 +53,7 @@ app.command(/.*?/, async (args) => {
             break;
         case '/addfriend':
             await require('./commands/addFriend.js')(args);
-            break;ww
+            break;
         default:
             await respond(`I don't know how to respond to the command ${command.command}`);
             break;
