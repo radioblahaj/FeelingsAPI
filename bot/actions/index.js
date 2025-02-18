@@ -3,15 +3,15 @@ const path = require("path");
 async function handleAction({ event, client, body, say }) {
   try {
     const firstAction = body.actions[0];
+    const viewId = body.view.callback_id
     const actionId = firstAction.action_id;
     const blockId = firstAction.block_id;
 
     
     console.log("it's working")
-    const block_id = body.block_id;
     const actionFile = path.resolve(__dirname, `${actionId}.js`);
 
-    // Dynamically require event handlers
+    // Dynamically require action handlers
     const actionHandler = require(actionFile);
     if (actionHandler) {
       await actionHandler({ event, client, body, say });

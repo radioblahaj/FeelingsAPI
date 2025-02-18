@@ -29,19 +29,20 @@ async function addFriend(args) {
             },
                 blocks: [
                     {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Who are you?"
-                        },
-                        "accessory": {
-                            "type": "users_select",
+                        "type": "input",
+                        "element": {
+                            "type": "multi_users_select",
                             "placeholder": {
                                 "type": "plain_text",
-                                "text": "Who do you want to add?",
+                                "text": "Select users",
                                 "emoji": true
                             },
-                            "action_id": "users_select-action"
+                            "action_id": "multi_users_select-action"
+                        },
+                        "label": {
+                            "type": "plain_text",
+                            "text": "Label",
+                            "emoji": true
                         }
                     },
                     {
@@ -67,7 +68,7 @@ async function addFriend(args) {
                                     "emoji": true
                                 },
                                 "value": "click_me_123",
-                                "action_id": "add_friend"
+                                "action_id": "next_step_friend"
                             }
                         ]
                     }

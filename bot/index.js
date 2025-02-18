@@ -9,7 +9,8 @@ const receiver = new ExpressReceiver({
 })
 
 const handleEvent = require("./events/index.js");
-const handleAction = require("./actions/index.js")
+const handleAction = require("./actions/index.js");
+const handleViews = require("./views/index.js");
 
 receiver.router.use(express.json())
 receiver.router.get('/ping', require('./endpoints/ping'))
@@ -35,6 +36,7 @@ receiver.router.get('/ping', require('./endpoints/ping'))
 
 app.event(/.*/, handleEvent); // Catch all events dynamically
 app.action(/.*/, handleAction) // Catch all actions dynamically
+app.view(/.*/, handleViews)
 
 app.command(/.*?/, async (args) => {
 
@@ -51,7 +53,7 @@ app.command(/.*?/, async (args) => {
             break;
         case '/addfriend':
             await require('./commands/addFriend.js')(args);
-            break;
+            break;ww
         default:
             await respond(`I don't know how to respond to the command ${command.command}`);
             break;

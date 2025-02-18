@@ -260,6 +260,29 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
     }
 })
 
+app.get('/account/key/:authtoken', async (req, res) => {
+    const authToken = process.env.AUTH_TOKEN;
+    const token = req.params.authtoken;
+    const user = req.query.user
+
+    if (authToken !== token) {
+        res.status(401).send("Unauthorized")
+        return
+    }
+
+    const userKey = await prisma.user.findFirst({
+        where: {
+            slackId: user,
+        }
+    })
+
+    const key = userKey.key;
+
+    return res.json({
+        data: key
+    })
+})
+
 /**
  * GET /feelings/all/:userId/:keyword
  * Get all feelings for a user
@@ -405,6 +428,7 @@ try {
     return
 }
 })
+
 
 
 /**
