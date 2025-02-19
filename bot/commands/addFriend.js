@@ -1,117 +1,73 @@
 async function addFriend(args) {
+    // Correct the import - no destructuring here
     const { payload, client, logger, ack, body } = args;
     const { user_id, text, channel_id } = payload;
 
     const commands = text.split(" ");
-    const friendId = commands[1]
-    
+    const friendId = commands[1];
 
-    const errors = []
-    // if (!frienId) errors.push("You need to specify a friend to add.")
+    const errors = [];
+    // if (!friendId) errors.push("You need to specify a friend to add.")
 
     if (errors.length > 0)
-                return await client.chat.postEphemeral({  user: `${user_id}`, text: errors.join("\n") });
+        return await client.chat.postEphemeral({ user: `${user_id}`, text: errors.join("\n") });
   
-
+  
     try {
-        // Call views.open with the built-in client
+        // Use client.views.open to trigger your modal view, passing trigger_id and view payload
         const result = await client.views.open({
-          // Pass a valid trigger_id within 3 seconds of receiving it
-          trigger_id: body.trigger_id,
-          // View payload
-          view: {
-            type: 'modal',
-            // View identifier
-            callback_id: 'view_1',
-            title: {
-              type: 'plain_text',
-              text: 'Modal title'
-            },
+            trigger_id: body.trigger_id,
+            view: {
+                type: 'modal',
+                callback_id: 'add_friend',
+                title: {
+                    type: 'plain_text',
+                    text: 'Add a Friend!'
+                },
                 blocks: [
                     {
-                        "type": "input",
-                        "element": {
-                            "type": "multi_users_select",
-                            "placeholder": {
-                                "type": "plain_text",
-                                "text": "Select users",
-                                "emoji": true
+                        type: "input",
+                        element: {
+                            type: "multi_users_select",
+                            placeholder: {
+                                type: "plain_text",
+                                text: "Select users",
+                                emoji: true
                             },
-                            "action_id": "multi_users_select-action"
+                            action_id: "multi_users_select-action"
                         },
-                        "label": {
-                            "type": "plain_text",
-                            "text": "Label",
-                            "emoji": true
+                        label: {
+                            type: "plain_text",
+                            text: "Friend Username",
+                            emoji: true
                         }
                     },
                     {
-                        "type": "input",
-                        "element": {
-                            "type": "plain_text_input",
-                            "action_id": "plain_text_input-action"
-                        },
-                        "label": {
-                            "type": "plain_text",
-                            "text": "What is your Key?",
-                            "emoji": true
-                        }
-                    },
-                    {
-                        "type": "actions",
-                        "elements": [
+                        type: "actions",
+                        elements: [
                             {
-                                "type": "button",
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "Add Friend",
-                                    "emoji": true
+                                type: "button",
+                                text: {
+                                    type: "plain_text",
+                                    text: "Add Friend",
+                                    emoji: true
                                 },
-                                "value": "click_me_123",
-                                "action_id": "next_step_friend"
+                                value: "click_me_123",
+                                action_id: "next_step_friend"
                             }
                         ]
                     }
                 ],
-            submit: {
-              type: 'plain_text',
-              text: 'Submit',
+                submit: {
+                    type: 'plain_text',
+                    text: 'Submit'
+                }
             }
-          }
         });
-        logger.info("hi" + result);
-
-        
-      }
-
-      catch (error) {
-        logger.error("hi! \n" + error);
-      }
-
-    // try {
-    //     const response = await fetch("https://api.blahaj.diy/account/friends", {
-    //         method: "POST",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         },
-    //         body: JSON.stringify({
-    //             userId: user_id,
-    //             key: key,
-    //             friendId: friendId
-    //         })
-    //     });
-    //         } catch (e) {
-    //             console.log(e)
-    //         }
-
-        // await client.chat.postEphemeral({
-        //     channel: channel_id,
-        //     user: user_id,
-        //     text: `<@${userToBan}> has been banned from all channels for ${reason}`,
-        //     mrkdwn: true
-        // });
-   
-
+        logger.info("Modal opened: " + result);
+    } catch (error) {
+        logger.error("Error opening modal: \n" + error);
+    }
 }
 
 module.exports = addFriend;

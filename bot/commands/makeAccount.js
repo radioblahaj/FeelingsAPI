@@ -23,14 +23,14 @@ async function makeAccount(args) {
  
 
     try {
-        const makeAccount = await fetch("http://api.blahaj.diy/account", {
+        const makeAccount = await fetch("http://localhost:1234/account", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 userId: user_id,
-                channel: channel
+                channel: "a"
             })    
         });
 

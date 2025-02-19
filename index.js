@@ -265,6 +265,9 @@ app.get('/account/key/:authtoken', async (req, res) => {
     const token = req.params.authtoken;
     const user = req.query.user
 
+    console.log(token)
+    console.log(user)
+
     if (authToken !== token) {
         res.status(401).send("Unauthorized")
         return
@@ -365,16 +368,17 @@ app.get('/account', async (req, res) => {
     const userId = req.query.userId
     const keyword = req.query.keyword
     const category = req.query.category
+    console.log(keyword)
+    console.log(userId)
 
 try {
     const userKey = await prisma.user.findFirst({
         where: {
-            slackId: userId,
-            key: keyword
+            slackId: userId
         }
     })
 
-    if (!userKey) {
+    if (userKey.key !== keyword) {
         res.status(401).send("Unauthorized")
         return
     }
@@ -384,7 +388,7 @@ try {
     }
 
 
-    const feelingsByCategory = await prisma.feelings.count({
+    let feelingsByCategory = await prisma.feelings.count({
         where: {
             userId: userId,
             category: category
@@ -403,7 +407,7 @@ try {
         }
     })
 
-    const friends = await prisma.user.findMany({
+    const friends = await prisma.friend.findMany({
         where: {
             userId: userId
         }
@@ -416,6 +420,7 @@ try {
 
     res.json({
         data: {
+            test: "hi",
             slackId: user.slackId,
             totalFeelings: totalFeelings,
             friends: friends,
@@ -565,19 +570,19 @@ app.post('/feelings', async (req, res) => {
  */
 app.post('/account/friends', async (req, res) => {
     const { userId, friendId, key } = req.body
-
+    console.log(userId)
+    console.log(key)
     try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: key
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId
+            }
+        })
+    
+        if (userKey.key !== key) {
+            res.status(401).send("Unauthorized")
+            return
         }
-    })
-
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
-        return
-    }
 
     const addFriend = await prisma.friend.create({
         data: {
