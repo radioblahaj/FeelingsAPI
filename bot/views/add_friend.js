@@ -21,13 +21,13 @@ module.exports = async function view1({ ack, event, client, body, say, logger })
             })
         });
         
+
         await client.chat.postMessage({
             channel: users[0],
             text: `<@${user}> added you as a friend! You can see their feelings now (this is a test, ignore this message)`
         })
 
 
-        console.log("?")
         await ack()
         
         if (!makeAccount.ok) {

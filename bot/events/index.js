@@ -2,7 +2,7 @@ const path = require("path");
 
 async function handleEvent({ event, client, body, say }) {
   try {
-    console.log(body)
+    console.log(event.type)
     const eventName = event.type;
     const eventFile = path.resolve(__dirname, `${eventName}.js`);
 
@@ -14,7 +14,7 @@ async function handleEvent({ event, client, body, say }) {
       console.warn(`No handler found for event: ${eventName}`);
     }
   } catch (error) {
-    console.error(`Error handling event ${event.type}:`, error);
+    // console.error(`idk handling event:`, error);
   }
 }
 

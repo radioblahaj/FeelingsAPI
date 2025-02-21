@@ -1,38 +1,73 @@
+const getAllFeelings = require("../utils/getAllFeelings");
+
 module.exports = async function appHomeOpened({ event, client, body, say, logger }) {
-    try {
-            try {
-              // Call views.publish with the built-in client
-              const result = await client.views.publish({
-                // Use the user ID associated with the event
-                user_id: event.user,
-                view: {
-                  // Home tabs must be enabled in your app configuration page under "App Home"
-                  type: "home",
-                  blocks: [
-                    {
-                      type: "section",
-                      text: {
-                        type: "mrkdwn",
-                        text: "*Welcome home, <@" + event.user + "> :house:*"
-                      }
-                    },
-                    {
-                      type: "section",
-                      text: {
-                        type: "mrkdwn",
-                        text: "Learn how home tabs can be more useful and interactive <https://api.slack.com/surfaces/tabs/using|*in the documentation*>."
-                      }
-                    }
-                  ]
-                }
-              });
-          
-              logger.info(result);
-            }
-            catch (error) {
-              logger.error(error);
-            }
-    } catch (error) {
-      console.error("Error handling EVENTNAME:", error);
-    }
+  try {
+    const feelings = await getAllFeelings(event.user);
+    console.log("User:", event.user);
+    let blocks = [];
+    let emoji;
+
+
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Welcome home, <@${event.user}> :house:*`
+      }
+    });
+
+    feelings.forEach((feelingItem, key) => {
+      emoji = getCategory(feelingItem, emoji);
+      
+      blocks.push({
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*${emoji} Feeling ${key}:* ${feelingItem.feeling}`
+        }
+      });
+    });
+    
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Time ${key}:* ${feelingItem.date}`
+      }
+    });
+
+    
+
+    const result = await client.views.publish({
+      user_id: event.user,
+      view: {
+        type: "home",
+        blocks: blocks
+      }
+    });
+
+    logger.info("View published:", result);
+  } catch (error) {
+    logger.error("Error handling appHomeOpened event:", error);
   }
+
+  function getCategory(feelingItem, emoji) {
+    switch (feelingItem.category) {
+      case 'yellow':
+        emoji = "💛";
+        break;
+      case 'blue':
+        emoji = "💙";
+        break;
+      case 'green':
+        emoji = "💚";
+        break;
+      case 'red':
+        emoji = "🟥";
+        break;
+      default:
+        emoji = "💜";
+    }
+    return emoji;
+  }
+};

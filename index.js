@@ -61,6 +61,7 @@ app.get('/', (req, res) => {
 app.get('/feelings/:userId/:keyword', async (req, res, next) => {
     const userId = req.params.userId
     const keyword = req.params.keyword
+    console.log(keyword)
 
 try {
     const userKey = await prisma.user.findFirst({
@@ -96,9 +97,7 @@ try {
         return isValid;
     });
 
-    res.json({
-        data: filteredFeelings
-    })
+    res.json(filteredFeelings)
 } catch(e) {
     console.error(e)
     res.status(500).json({ error: e.message })
@@ -364,12 +363,12 @@ app.post('/account', async (req, res) => {
  * @param {string} req.query.category - Optional category to filter feelings count
  * @returns {Object} User account data including total feelings, friends, and feelings by category
  */
-app.get('/account', async (req, res) => {
-    const userId = req.query.userId
-    const keyword = req.query.keyword
+app.get('/account/:userID/:keyword', async (req, res) => {
+    const userId = req.params.userID
+    const keyword = req.params.keyword
     const category = req.query.category
     console.log(keyword)
-    console.log(userId)
+    console.log("hi" + userId)
 
 try {
     const userKey = await prisma.user.findFirst({
@@ -386,6 +385,34 @@ try {
     if (!category) {
         res.status
     }
+
+    let happyCategories = await prisma.feelings.count({
+        where: {
+            userId: userId,
+            category: "yellow"
+        }
+    })
+
+    let sadCategories = await prisma.feelings.count({
+        where: {
+            userId: userId,
+            category: "blue"
+        }
+    })
+
+    let redCategories = await prisma.feelings.count({
+        where: {
+            userId: userId,
+            category: "red"
+        }
+    })
+
+    let greenCategories = await prisma.feelings.count({
+        where: {
+            userId: userId,
+            category: "green"
+        }
+    })
 
 
     let feelingsByCategory = await prisma.feelings.count({
@@ -413,19 +440,23 @@ try {
         }
     })
 
+
+    console.log(friends)
+
     if (!feelingsByCategory) {
         feelingsByCategory = 0
     }
 
 
     res.json({
-        data: {
-            test: "hi",
             slackId: user.slackId,
             totalFeelings: totalFeelings,
             friends: friends,
-            feelingsByCategory: feelingsByCategory
-        }
+            blueCount: sadCategories,
+            yellowCount: happyCategories,
+            greenCount: greenCategories,
+            redCount: redCategories,
+        
     })
 } catch(e) {
     console.error(e)
@@ -714,6 +745,8 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
             userId: userId
         }
     })
+
+
 
     // AI wrote this part
     const friendsFeelings = await Promise.all(

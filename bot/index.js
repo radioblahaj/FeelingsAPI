@@ -11,6 +11,11 @@ const receiver = new ExpressReceiver({
 const handleEvent = require("./events/index.js");
 const handleAction = require("./actions/index.js");
 const handleViews = require("./views/index.js");
+const getAccountStats = require("./utils/getAccountStats.js");
+const getAllFeelings = require("./utils/getAllFeelings.js")
+
+getAccountStats("U01MPHKFZ7S")
+
 
 receiver.router.use(express.json())
 receiver.router.get('/ping', require('./endpoints/ping'))

@@ -30,7 +30,7 @@ async function makeAccount(args) {
             },
             body: JSON.stringify({
                 userId: user_id,
-                channel: "a"
+                channel: channel
             })    
         });
 
