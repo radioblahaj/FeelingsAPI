@@ -2,11 +2,11 @@ const getKey = require("./getKey");
 const path = require("path");
 
 
-async function getAllFeelings(user) {
+async function getAllFeelings(user, item="", query="") {
    try {
      const {key, status} = await getKey(user)
      console.log(__filename, "I'm running (Line 8)")
-     const getFeelings = await fetch(`http://localhost:1234/feelings/${user}/${key}?share=${true}`)
+     const getFeelings = await fetch(`http://localhost:1234/feelings/${user}/${key}?${item}=${query}`)
      if (!getFeelings.ok) {
       return status
      }
