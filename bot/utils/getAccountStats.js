@@ -28,12 +28,12 @@ async function getAccountStats(user) {
                 categoryCount.set("blue", response.blueCount)
                 categoryCount.set("red", response.redCount)
                 categoryCount.set("green", response.greenCount)
-                console.log("account stats", true)
+                console.log(__filename, "account stats (line 31)")
                 return { friends, categoryCount, totalFeelings, friendCount, status}
                 break;
             case false:
                 console.log("no account found")
-                console.log("account stats", status)
+                console.log(__filename, "account stats (line 36)", false)
                 return {status}
         }
 

@@ -88,7 +88,7 @@ async function addFeeling(args) {
         }
 
     } catch (e) {
-       console.log(e)
+       console.log(__filename, e)
     }
 
 }

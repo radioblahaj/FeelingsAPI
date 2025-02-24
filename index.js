@@ -83,21 +83,35 @@ app.get('/feelings/:userId/:keyword', async (req, res, next) => {
             }
         })
 
-        console.log(feelings)
-
         const data = feelings;
         const filters = req.query;
         console.log(filters)
         const filteredFeelings = data.filter(feeling => {
             let isValid = true;
             for (key in filters) {
-                console.log(key, filters[key], filters[key])
-                isValid = isValid && feeling[key] == filters[key];
+                console.log(key, filters[key])
+                const looking = filters[key]
+                console.log(true, looking)
+                if (key === "share") {
+                    switch (filters[key]) {
+                        case "true":
+                            filters[key] = true;
+                            break;
+                        case "false":
+                            filters[key] = false
+                            break;
+                    }
+                }
+
+                isValid = isValid && feeling[key] === filters[key]
             }
+            console.log(isValid)
             return isValid;
         });
+        // console.log(filteredFeelings)
+        return res.json(filteredFeelings)
 
-        res.json(filteredFeelings)
+
     } catch (e) {
         console.error(e)
         res.status(500).json({ error: e.message })

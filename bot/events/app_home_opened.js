@@ -9,15 +9,15 @@ module.exports = async function appHomeOpened({ event, client, body, say, logger
     console.log(body)
 
     const { friendCount, friends, totalFeelings, categoryCount, status } = await getAccountStats(event.user)
-    await getAllFeelings(event.user);
-    console.log("app home opened", status)
+    const feelings = await getAllFeelings(event.user);
+    console.log(__filename, "app home opened (line 13)")
     console.log(status)
     if (!status) {
       blocks.push({
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*Welcome! <@${event.user}>*, you don't have an account! You need to make one to use Blahaj DIY!`
+          text: `*Welcome <@${event.user}>*, you don't have an account! You need to make one to use Blahaj DIY!`
         }
       });
 
@@ -72,6 +72,8 @@ module.exports = async function appHomeOpened({ event, client, body, say, logger
 			]
     });
 
+    console.log(__dirname, "I just added the buttons")
+
     blocks.push({
       type: "section",
       fields: [
@@ -85,9 +87,10 @@ module.exports = async function appHomeOpened({ event, client, body, say, logger
         }
       ]
     })
+    console.log(__dirname, "I just added the dashboard")
 
-  
-    feelings.forEach((feelingItem, key) => {
+      console.log(feelings)
+      feelings.forEach((feelingItem, key) => {
       emoji = getCategory(feelingItem, emoji);
 
       blocks.push({
@@ -102,13 +105,15 @@ module.exports = async function appHomeOpened({ event, client, body, say, logger
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*Time:* ${feelingItem.date}`
+          text: `*Time!:* ${feelingItem.date}`
         }
       });
     });
+    console.log(__dirname, "I just added the feelings")
 
-    publishBlocks("home", event.user, blocks)
 
+    publishBlocks("home", event.user, client, blocks)
+    console.log(__filename, "I published the view!")
 
     
 

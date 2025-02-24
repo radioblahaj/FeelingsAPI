@@ -11,7 +11,7 @@ async function getKey(user) {
      let key = response.data
      let status = getUser.ok
 
-     console.log("Get Key", status)
+     console.log(__filename, "Get Key (line 14)")
 
      return {key, status}
 

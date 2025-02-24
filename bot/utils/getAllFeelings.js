@@ -1,28 +1,29 @@
 const getKey = require("./getKey");
+const path = require("path");
+
 
 async function getAllFeelings(user) {
    try {
      const {key, status} = await getKey(user)
-     console.log(status)
-     const status2 = status;
-     const getFeelings = await fetch(`http://localhost:1234/feelings/${user}/${key}`)
+     console.log(__filename, "I'm running (Line 8)")
+     const getFeelings = await fetch(`http://localhost:1234/feelings/${user}/${key}?share=${true}`)
      if (!getFeelings.ok) {
       return status
      }
      let response = await getFeelings.json()
-     // console.log(response)
-     
+     console.log(response)
+     console.log(__filename, "i got feelings! (Line 15)")
      const feelings = new Map()
  
      response.forEach(element => {
          feelings.set(element.id, element)
      });
  
-     // console.log(feelings)
+     console.log(feelings)
      return feelings
 
    } catch (error) {
-    console.log(error)
+    console.log(__filename, error)
    }
 }
 
