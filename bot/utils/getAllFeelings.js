@@ -19,7 +19,7 @@ async function getAllFeelings(user) {
      });
  
      // console.log(feelings)
-     return { feelings, status2 }
+     return feelings
 
    } catch (error) {
     console.log(error)

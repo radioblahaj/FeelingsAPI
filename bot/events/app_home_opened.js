@@ -1,10 +1,12 @@
 const getAllFeelings = require("../utils/getAllFeelings");
 const getAccountStats = require("../utils/getAccountStats");
+const publishBlocks = require("../utils/publish")
 
 module.exports = async function appHomeOpened({ event, client, body, say, logger }) {
   try {
     let blocks = [];
     let emoji;
+    console.log(body)
 
     const { friendCount, friends, totalFeelings, categoryCount, status } = await getAccountStats(event.user)
     await getAllFeelings(event.user);
@@ -15,23 +17,34 @@ module.exports = async function appHomeOpened({ event, client, body, say, logger
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*Welcome! <@${event.user}> :D :house:*`
+          text: `*Welcome! <@${event.user}>*, you don't have an account! You need to make one to use Blahaj DIY!`
         }
       });
 
-      const result = await client.views.publish({
-        user_id: event.user,
-        view: {
-          type: "home",
-          blocks: blocks
-        }
+      blocks.push({
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "Make account"
+            },
+            style: "primary",
+            action_id: "make_account",
+            value: "click_me_123"
+          },
+        ]
       });
+
+      
+      publishBlocks("home", event.user, client, blocks)
       return 
     }
 
     console.log("User:");
   
-
     blocks.push({
       type: "actions",
 			elements: [
@@ -73,6 +86,7 @@ module.exports = async function appHomeOpened({ event, client, body, say, logger
       ]
     })
 
+  
     feelings.forEach((feelingItem, key) => {
       emoji = getCategory(feelingItem, emoji);
 
@@ -93,24 +107,12 @@ module.exports = async function appHomeOpened({ event, client, body, say, logger
       });
     });
 
-    
+    publishBlocks("home", event.user, blocks)
 
-
-
-
-
-
-    const result = await client.views.publish({
-      user_id: event.user,
-      view: {
-        type: "home",
-        blocks: blocks
-      }
-    });
 
     
 
-    logger.info("View published:", result);
+    logger.info("View published");
   } catch (error) {
     logger.error("Error handling appHomeOpened event:", error);
   }
