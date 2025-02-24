@@ -1,6 +1,6 @@
 const path = require("path");
 
-async function handleAction({ event, client, body, say }) {
+async function handleAction({ event, client, body, say, logger, ack }) {
   try {
     const firstAction = body.actions[0];
     const viewId = body.view.callback_id
@@ -14,7 +14,7 @@ async function handleAction({ event, client, body, say }) {
     // Dynamically require action handlers
     const actionHandler = require(actionFile);
     if (actionHandler) {
-      await actionHandler({ event, client, body, say });
+      await actionHandler({ event, client, body, say, logger, ack });
     } else {
       console.warn(`No handler found for action: ${actionId}`);
     }

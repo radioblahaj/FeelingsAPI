@@ -63,46 +63,46 @@ app.get('/feelings/:userId/:keyword', async (req, res, next) => {
     const keyword = req.params.keyword
     console.log(keyword)
 
-try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: keyword
-        }
-    })
+    try {
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
 
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+
+
+        const feelings = await prisma.feelings.findMany({
+            where: {
+                userId: userId
+            }
+        })
+
+        console.log(feelings)
+
+        const data = feelings;
+        const filters = req.query;
+        console.log(filters)
+        const filteredFeelings = data.filter(feeling => {
+            let isValid = true;
+            for (key in filters) {
+                console.log(key, filters[key], filters[key])
+                isValid = isValid && feeling[key] == filters[key];
+            }
+            return isValid;
+        });
+
+        res.json(filteredFeelings)
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
         return
     }
-    
-
-    const feelings = await prisma.feelings.findMany({
-        where: {
-            userId: userId
-        }
-    })
-
-    console.log(feelings)
-
-    const data = feelings;
-    const filters = req.query;
-    console.log(filters)
-    const filteredFeelings = data.filter(feeling => {
-        let isValid = true;
-        for (key in filters) {
-            console.log(key, filters[key], filters[key])
-            isValid = isValid && feeling[key] == filters[key];
-        }
-        return isValid;
-    });
-
-    res.json(filteredFeelings)
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
 });
 
 app.get('/feelings/last/:userId/:keyword', async (req, res, next) => {
@@ -110,34 +110,34 @@ app.get('/feelings/last/:userId/:keyword', async (req, res, next) => {
     const keyword = req.params.keyword
 
     try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: keyword
-        }
-    })
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
 
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+
+        const feelings = await prisma.feelings.findFirst({
+            where: {
+                userId: userId
+            }
+        })
+
+        console.log(feelings)
+
+        res.json({
+            data: feelings
+        })
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
         return
     }
-
-    const feelings = await prisma.feelings.findFirst({
-        where: {
-            userId: userId
-        }
-    })
-
-    console.log(feelings)
-
-    res.json({
-        data: feelings
-    })
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
 });
 
 
@@ -156,103 +156,103 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
     const keyword = req.params.keyword
 
     try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: keyword
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
+
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
         }
-    })
 
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
-        return
-    }
-
-    const range = req.query.range
-    const parsedRange = chrono.parse(range)
+        const range = req.query.range
+        const parsedRange = chrono.parse(range)
 
 
 
-    if (range === "today") {
+        if (range === "today") {
 
-        let date = parsedRange[0].start.date()
-        let yesterday = chrono.parse("Yesterday")
-        console.log(yesterday[0].start.date())
-        let tomorrow = chrono.parse("Tomorrow")
-        console.log(tomorrow[0].start.date())
+            let date = parsedRange[0].start.date()
+            let yesterday = chrono.parse("Yesterday")
+            console.log(yesterday[0].start.date())
+            let tomorrow = chrono.parse("Tomorrow")
+            console.log(tomorrow[0].start.date())
 
-        const feelings = await prisma.feelings.findMany({
-            where: {
-                userId: userId,
-                date: {
-                    gte: yesterday[0].start.date(),
-                    lte: tomorrow[0].start.date()
+            const feelings = await prisma.feelings.findMany({
+                where: {
+                    userId: userId,
+                    date: {
+                        gte: yesterday[0].start.date(),
+                        lte: tomorrow[0].start.date()
+                    }
                 }
-            }
-        })
-        return res.json({
-            data: feelings
-        })
-    } else if (range === "yesterday") {
-        let date = parsedRange[0].start.date()
-        let yesterday = chrono.parse("Yesterday")
-        console.log(yesterday[0].start.date())
-        let tomorrow = chrono.parse("Tomorrow")
-        console.log(tomorrow[0].start.date())
+            })
+            return res.json({
+                data: feelings
+            })
+        } else if (range === "yesterday") {
+            let date = parsedRange[0].start.date()
+            let yesterday = chrono.parse("Yesterday")
+            console.log(yesterday[0].start.date())
+            let tomorrow = chrono.parse("Tomorrow")
+            console.log(tomorrow[0].start.date())
 
-        const feelings = await prisma.feelings.findMany({
-            where: {
-                userId: userId,
-                date: {
-                    gte: yesterday[0].start.date(),
-                    lte: tomorrow[0].start.date()
+            const feelings = await prisma.feelings.findMany({
+                where: {
+                    userId: userId,
+                    date: {
+                        gte: yesterday[0].start.date(),
+                        lte: tomorrow[0].start.date()
+                    }
                 }
-            }
-        })
-        return res.json({
-            data: feelings
-        })
+            })
+            return res.json({
+                data: feelings
+            })
 
-    } else if (range === "week") {
-        let yesterday = chrono.parse("Yesterday")
-        console.log(yesterday[0].start.date())
-        let today = chrono.parse("Today")
-        let lastWeek = chrono.parse("Last week")
-        console.log(today[0].start.date())
-        let tomorrow = chrono.parse("Tomorrow")
-        console.log(tomorrow[0].start.date())
+        } else if (range === "week") {
+            let yesterday = chrono.parse("Yesterday")
+            console.log(yesterday[0].start.date())
+            let today = chrono.parse("Today")
+            let lastWeek = chrono.parse("Last week")
+            console.log(today[0].start.date())
+            let tomorrow = chrono.parse("Tomorrow")
+            console.log(tomorrow[0].start.date())
 
-        const feelings = await prisma.feelings.findMany({
-            where: {
-                userId: userId,
-                date: {
-                    gte: lastWeek[0].start.date(),
-                    lte: tomorrow[0].start.date()
+            const feelings = await prisma.feelings.findMany({
+                where: {
+                    userId: userId,
+                    date: {
+                        gte: lastWeek[0].start.date(),
+                        lte: tomorrow[0].start.date()
+                    }
                 }
-            }
-        })
-        return res.json({
-            data: feelings
-        })
+            })
+            return res.json({
+                data: feelings
+            })
 
-    } else if (range === "month") {
-        let last_month = chrono.parse("Last Month")
-        let tomorrow = chrono.parse("Tomorrow")
+        } else if (range === "month") {
+            let last_month = chrono.parse("Last Month")
+            let tomorrow = chrono.parse("Tomorrow")
 
-        const feelings = await prisma.feelings.findMany({
-            where: {
-                userId: userId,
-                date: {
-                    gte: last_month[0].start.date(),
-                    lte: tomorrow[0].start.date()
+            const feelings = await prisma.feelings.findMany({
+                where: {
+                    userId: userId,
+                    date: {
+                        gte: last_month[0].start.date(),
+                        lte: tomorrow[0].start.date()
+                    }
                 }
-            }
-        })
-        return res.json({
-            data: feelings
-        })
-    }
-    } catch(e) {
+            })
+            return res.json({
+                data: feelings
+            })
+        }
+    } catch (e) {
         console.error(e)
         res.status(500).json({ error: e.message })
         return
@@ -260,30 +260,39 @@ app.get('/feelings/date/:userId/:keyword', async (req, res) => {
 })
 
 app.get('/account/key/:authtoken', async (req, res) => {
-    const authToken = process.env.AUTH_TOKEN;
-    const token = req.params.authtoken;
-    const user = req.query.user
+    try {
+        const authToken = process.env.AUTH_TOKEN;
+        const token = req.params.authtoken;
+        const user = req.query.user
 
-    console.log(token)
-    console.log(user)
+        console.log(token)
+        console.log(user)
 
-    if (authToken !== token) {
-        res.status(401).send("Unauthorized")
+        if (authToken !== token) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: user,
+            }
+        })
+
+        const key = userKey.key;
+        return res.json({
+            data: key
+        })
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: error.message })
         return
     }
 
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: user,
-        }
-    })
+}
+)
 
-    const key = userKey.key;
-
-    return res.json({
-        data: key
-    })
-})
 
 /**
  * GET /feelings/all/:userId/:keyword
@@ -293,32 +302,32 @@ app.get('/account/key/:authtoken', async (req, res) => {
  * @returns {Object} All feelings for the user
  */
 app.get('/feelings/all/:userId/:keyword', async (req, res) => {
-    
+
     try {
-    const userId = req.params.userId
-    const keyword = req.params.keyword
+        const userId = req.params.userId
+        const keyword = req.params.keyword
 
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: keyword
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
+
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
         }
-    })
 
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
-        return
+
+        console.log(range)
+        res.json({
+            data: range
+        })
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
     }
-
-   
-    console.log(range)
-    res.json({
-        data: range
-    })
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-}
 })
 
 /**
@@ -334,25 +343,25 @@ app.post('/account', async (req, res) => {
     const key = crypto.randomBytes(20).toString('hex');
 
     try {
-    const user = await prisma.user.create({
-        data: {
-            slackId: userId,
-            key: key,
-            channel: channel
-        }
-    })
-    console.log(`Account created for ${userId}`)
-    console.log(user)
-    res.json({
-        data: {
-            key: key
-        }
-    })
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
+        const user = await prisma.user.create({
+            data: {
+                slackId: userId,
+                key: key,
+                channel: channel
+            }
+        })
+        console.log(`Account created for ${userId}`)
+        console.log(user)
+        res.json({
+            data: {
+                key: key
+            }
+        })
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
+        return
+    }
 })
 
 /**
@@ -363,92 +372,92 @@ app.post('/account', async (req, res) => {
  * @param {string} req.query.category - Optional category to filter feelings count
  * @returns {Object} User account data including total feelings, friends, and feelings by category
  */
+
 app.get('/account/:userID/:keyword', async (req, res) => {
     const userId = req.params.userID
     const keyword = req.params.keyword
     const category = req.query.category
     console.log(keyword)
     console.log("hi" + userId)
+    try {
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId
+            }
+        })
 
-try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId
+        if (userKey.key !== keyword) {
+            res.status(401).send("Unauthorized")
+            return
         }
-    })
 
-    if (userKey.key !== keyword) {
-        res.status(401).send("Unauthorized")
-        return
-    }
-
-    if (!category) {
-        res.status
-    }
-
-    let happyCategories = await prisma.feelings.count({
-        where: {
-            userId: userId,
-            category: "yellow"
+        if (!category) {
+            res.status
         }
-    })
 
-    let sadCategories = await prisma.feelings.count({
-        where: {
-            userId: userId,
-            category: "blue"
+        let happyCategories = await prisma.feelings.count({
+            where: {
+                userId: userId,
+                category: "yellow"
+            }
+        })
+
+        let sadCategories = await prisma.feelings.count({
+            where: {
+                userId: userId,
+                category: "blue"
+            }
+        })
+
+        let redCategories = await prisma.feelings.count({
+            where: {
+                userId: userId,
+                category: "red"
+            }
+        })
+
+        let greenCategories = await prisma.feelings.count({
+            where: {
+                userId: userId,
+                category: "green"
+            }
+        })
+
+
+        let feelingsByCategory = await prisma.feelings.count({
+            where: {
+                userId: userId,
+                category: category
+            }
+        })
+
+        const user = await prisma.user.findFirst({
+            where: {
+                slackId: userId
+            }
+        })
+
+        const totalFeelings = await prisma.feelings.count({
+            where: {
+                userId: userId
+            }
+        })
+
+        const friends = await prisma.friend.findMany({
+            where: {
+                userId: userId
+            }
+        })
+
+
+        console.log(friends)
+
+        if (!feelingsByCategory) {
+            feelingsByCategory = 0
         }
-    })
-
-    let redCategories = await prisma.feelings.count({
-        where: {
-            userId: userId,
-            category: "red"
-        }
-    })
-
-    let greenCategories = await prisma.feelings.count({
-        where: {
-            userId: userId,
-            category: "green"
-        }
-    })
 
 
-    let feelingsByCategory = await prisma.feelings.count({
-        where: {
-            userId: userId,
-            category: category
-        }
-    })
-
-    const user = await prisma.user.findFirst({
-        where: {
-            slackId: userId
-        }
-    })
-
-    const totalFeelings = await prisma.feelings.count({
-        where: {
-            userId: userId
-        }
-    })
-
-    const friends = await prisma.friend.findMany({
-        where: {
-            userId: userId
-        }
-    })
-
-
-    console.log(friends)
-
-    if (!feelingsByCategory) {
-        feelingsByCategory = 0
-    }
-
-
-    res.json({
+        res.json({
             slackId: user.slackId,
             totalFeelings: totalFeelings,
             friends: friends,
@@ -456,13 +465,13 @@ try {
             yellowCount: happyCategories,
             greenCount: greenCategories,
             redCount: redCategories,
-        
-    })
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
+
+        })
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
+        return
+    }
 })
 
 
@@ -487,107 +496,107 @@ app.post('/feelings', async (req, res) => {
     let { feeling1, feeling2, note, share, userId, keyword } = newFeeling
 
     try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: keyword
-        }
-    })
-
-    const channel = userKey.channel
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
-        return
-    }
-
-
-
-    console.log("Received new feeling:", newFeeling);
-
-    if (!userId) {
-        res.status(400).json({ error: "User ID is required" });
-        return;
-    }
-
-    if (!share) {
-        share = false;
-    }
-
-    if (!feeling1) {
-        res.status(400).json({ error: "Feeling 1 is required" });
-        return;
-    }
-
-    if (!feeling2) {
-        feeling2 = null;
-    }
-
-    if (!note) {
-        note = "";
-    }
-
-
-    const category = getCategory(feeling1);
-    const category2 = getCategory(feeling2);
-
-
-    try {
-        const feeling = await prisma.feelings.create({
-            data: {
-                date: new Date(),
-                feeling: feeling1,
-                note: note,
-                feeling2: feeling2,
-                share: share,
-                category: category,
-                category2: category2,
-                userId: userId
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
             }
-        });
-        console.log(feeling)
-        console.log(new Date())
+        })
+
+        const channel = userKey.channel
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+
+
+
+        console.log("Received new feeling:", newFeeling);
+
+        if (!userId) {
+            res.status(400).json({ error: "User ID is required" });
+            return;
+        }
+
+        if (!share) {
+            share = false;
+        }
+
+        if (!feeling1) {
+            res.status(400).json({ error: "Feeling 1 is required" });
+            return;
+        }
+
+        if (!feeling2) {
+            feeling2 = null;
+        }
+
+        if (!note) {
+            note = "";
+        }
+
+
+        const category = getCategory(feeling1);
+        const category2 = getCategory(feeling2);
+
 
         try {
-            const sendToSlack = await fetch("https://82ab-99-245-95-215.ngrok-free.app/new-feeling", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ 
-                    feeling1: feeling1,
-                    feeling2: feeling2,
+            const feeling = await prisma.feelings.create({
+                data: {
+                    date: new Date(),
+                    feeling: feeling1,
                     note: note,
-                    share: (share === "true") ? share = true : share = false,
-                    userId: userId,
-                    channel: channel
-                })
+                    feeling2: feeling2,
+                    share: share,
+                    category: category,
+                    category2: category2,
+                    userId: userId
+                }
             });
-            const response = await sendToSlack.json();
-        } catch (error) {
-            console.error("Error sending to Slack:", error);
-        }
+            console.log(feeling)
+            console.log(new Date())
 
-        res.json({
-            data: {
-                category: category,
-                category2: category2
+            try {
+                const sendToSlack = await fetch("https://82ab-99-245-95-215.ngrok-free.app/new-feeling", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        feeling1: feeling1,
+                        feeling2: feeling2,
+                        note: note,
+                        share: (share === "true") ? share = true : share = false,
+                        userId: userId,
+                        channel: channel
+                    })
+                });
+                const response = await sendToSlack.json();
+            } catch (error) {
+                console.error("Error sending to Slack:", error);
             }
-        });
-        console.log(category, category2)
 
-    } catch (error) {
-        res.status(500).json({
-            status: "error",
-            message: "Failed to save feeling",
-            error: error.message
-        });
-        console.error(error.message)
+            res.json({
+                data: {
+                    category: category,
+                    category2: category2
+                }
+            });
+            console.log(category, category2)
+
+        } catch (error) {
+            res.status(500).json({
+                status: "error",
+                message: "Failed to save feeling",
+                error: error.message
+            });
+            console.error(error.message)
+        }
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
+        return
     }
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
 });
 
 /**
@@ -609,70 +618,70 @@ app.post('/account/friends', async (req, res) => {
                 slackId: userId
             }
         })
-    
+
         if (userKey.key !== key) {
             res.status(401).send("Unauthorized")
             return
         }
 
-    const addFriend = await prisma.friend.create({
-        data: {
-            userId: userId,
-            friendId: friendId
-        }
-    })
+        const addFriend = await prisma.friend.create({
+            data: {
+                userId: userId,
+                friendId: friendId
+            }
+        })
 
-    res.json({
-        data: {
-            message: `Friend added: ${friendId}`
-        }
-    })
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
+        res.json({
+            data: {
+                message: `Friend added: ${friendId}`
+            }
+        })
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
+        return
+    }
 })
 
 app.post('/account/information/update', async (req, res) => {
     const { userId, key, newKey, random } = req.body
 
     try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: key
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: key
+            }
+        })
+
+        if (random = true) {
+            const newKey = crypto.randomBytes(20).toString('hex');
         }
-    })
 
-    if (random = true) {
-        const newKey = crypto.randomBytes(20).toString('hex');
-    }
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
 
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
+
+        const updateRecord = await prisma.user.update({
+            where: {
+                slackId: userId,
+                key: key
+            },
+            data: {
+                key: newKey
+            }
+        })
+
+        return res.json({
+            data: newKey
+        })
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
         return
     }
-
-
-    const updateRecord = await prisma.user.update({
-        where: {
-            slackId: userId,
-            key: key
-        },
-        data: {
-            key: newKey
-        }
-    })
-
-    return res.json({
-        data: newKey
-    })
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
 })
 
 /**
@@ -685,34 +694,34 @@ app.post('/account/information/update', async (req, res) => {
 app.get('/account/friends/:userId/:keyword', async (req, res) => {
     const userId = req.params.userId
     const keyword = req.params.keyword
-    
-    try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: keyword
-        }
-    })
 
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
+    try {
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
+
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+
+        const friends = await prisma.friend.findMany({
+            where: {
+                userId: userId
+            }
+        })
+
+        res.json({
+            data: friends
+        })
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
         return
     }
-
-    const friends = await prisma.friend.findMany({
-        where: {
-            userId: userId
-        }
-    })
-
-    res.json({
-        data: friends
-    })
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
 })
 
 /**
@@ -728,63 +737,63 @@ app.get('/feelings/friends/:userId/:keyword', async (req, res) => {
     const keyword = req.params.keyword
 
     try {
-    const userKey = await prisma.user.findFirst({
-        where: {
-            slackId: userId,
-            key: keyword
-        }
-    })
+        const userKey = await prisma.user.findFirst({
+            where: {
+                slackId: userId,
+                key: keyword
+            }
+        })
 
-    if (!userKey) {
-        res.status(401).send("Unauthorized")
+        if (!userKey) {
+            res.status(401).send("Unauthorized")
+            return
+        }
+
+        const friends = await prisma.friend.findMany({
+            where: {
+                userId: userId
+            }
+        })
+
+
+
+        // AI wrote this part
+        const friendsFeelings = await Promise.all(
+            friends.map(friend =>
+                prisma.feelings.findMany({
+                    where: {
+                        userId: friend.friendId,
+                        share: true
+                    }
+                })
+            )
+        )
+
+
+        // Flatten the array of arrays into a single array of feelings
+        const allFriendsFeelings = friendsFeelings.flat()
+
+        // Group feelings by user ID
+        const groupedFeelings = allFriendsFeelings.reduce((groups, feeling) => {
+            if (!groups[feeling.userId]) {
+                groups[feeling.userId] = [];
+            }
+            groups[feeling.userId].push(feeling);
+            return groups;
+        }, {});
+
+
+
+
+
+        return res.json({
+            data: groupedFeelings
+        });
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: e.message })
         return
     }
-
-    const friends = await prisma.friend.findMany({
-        where: {
-            userId: userId
-        }
-    })
-
-
-
-    // AI wrote this part
-    const friendsFeelings = await Promise.all(
-        friends.map(friend =>
-            prisma.feelings.findMany({
-                where: {
-                    userId: friend.friendId,
-                    share: true
-                }
-            })
-        )
-    )
-
-
-    // Flatten the array of arrays into a single array of feelings
-    const allFriendsFeelings = friendsFeelings.flat()
-
-    // Group feelings by user ID
-    const groupedFeelings = allFriendsFeelings.reduce((groups, feeling) => {
-        if (!groups[feeling.userId]) {
-            groups[feeling.userId] = [];
-        }
-        groups[feeling.userId].push(feeling);
-        return groups;
-    }, {});
-
-
-
-
-
-    return res.json({
-        data: groupedFeelings
-    });
-} catch(e) {
-    console.error(e)
-    res.status(500).json({ error: e.message })
-    return
-}
 })
 
 app.post('/habits', async (req, res) => {
@@ -797,28 +806,28 @@ app.post('/habits', async (req, res) => {
                 key: keyword
             }
         })
-    
-    if (!userKey) {
+
+        if (!userKey) {
             res.status(401).send("Unauthorized")
             return
         }
 
-    const createHabit = await prisma.habit.create({
-        data: {
-            userId: userId,
-            habit: habit,
-        }
-    })
+        const createHabit = await prisma.habit.create({
+            data: {
+                userId: userId,
+                habit: habit,
+            }
+        })
 
-    return res.json({
-        data: createHabit
-    })
+        return res.json({
+            data: createHabit
+        })
 
-    } catch(e) {
+    } catch (e) {
         console.error(e)
         res.status(500).json({ error: e.message })
         return
-    }   
+    }
 })
 
 app.get('/habits/:userId/:keyword', async (req, res) => {
@@ -832,22 +841,22 @@ app.get('/habits/:userId/:keyword', async (req, res) => {
                 key: keyword
             }
         })
-    
-    if (!userKey) {
+
+        if (!userKey) {
             res.status(401).send("Unauthorized")
             return
         }
-    const getHabit = await prisma.habit.findMany({
-        where:{
-            userId: userId
-        }
-    })   
-    
-    return res.json({
-        data: getHabit
-    })
+        const getHabit = await prisma.habit.findMany({
+            where: {
+                userId: userId
+            }
+        })
 
-    } catch(e) {
+        return res.json({
+            data: getHabit
+        })
+
+    } catch (e) {
         console.error(e)
         res.status(500).json({ error: e.message })
         return
